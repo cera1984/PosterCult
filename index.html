@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#182620" />
+    <meta name="description" content="Archivio privato dei poster su E:\POSTERZ: cerca le immagini e provale su magliette, felpe e poster." />
+    <title>Fuori Campo — Il tuo archivio di poster</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="local.css" />
+    <script src="gallery-data.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="announcement">IL TUO ARCHIVIO DI CINEMA <span aria-hidden="true">✦</span> SOLO SUL TUO COMPUTER</div>
+    <header class="site-header">
+      <a class="brand" href="#inizio" aria-label="Fuori Campo, torna all'inizio"><span class="brand-symbol" aria-hidden="true">✳</span><span>fuori<span class="brand-break">campo</span><span class="brand-dot">.</span></span></a>
+      <nav class="desktop-nav" aria-label="Navigazione principale">
+        <a href="#collezione">I tuoi poster</a><a href="#manifesto">L'archivio</a><a href="#come-funziona">Come usarlo</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button" id="search-toggle" type="button" aria-label="Cerca nella collezione" title="Cerca">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+        </button>
+        <button class="icon-button favorites-trigger" id="favorites-toggle" type="button" aria-label="Mostra i preferiti" title="Preferiti">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20.5 8.6c0 4.7-8.5 10-8.5 10s-8.5-5.3-8.5-10a4.6 4.6 0 0 1 8.5-2.3 4.6 4.6 0 0 1 8.5 2.3Z"/></svg><span class="favorites-count" id="favorites-count" hidden>0</span>
+        </button>
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Apri menu" aria-expanded="false"><span></span><span></span></button>
+      </div>
+    </header>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Navigazione mobile" hidden><a href="#collezione">I tuoi poster</a><a href="#manifesto">L'archivio</a><a href="#come-funziona">Come usarlo</a></nav>
+
+    <main id="inizio">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-grain" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <div class="eyebrow hero-eyebrow"><span class="little-star">✳</span> TUTTI I TUOI POSTER, IN UN POSTO SOLO <span class="line"></span> 2026</div>
+          <h1 id="hero-title">I tuoi film,<br /><em>fuori</em> dallo<br />schermo<span class="hero-period">.</span></h1>
+          <p>Le immagini del tuo archivio, finalmente facili da sfogliare. Scegli una grafica e provala subito su una maglietta, una felpa o un poster.</p>
+          <a href="#collezione" class="button button-light">Esplora i tuoi poster <span aria-hidden="true">↗</span></a>
+          <div class="hero-footnote"><span class="hero-footnote-dot"></span> ARCHIVIO LOCALE <span>·</span> NESSUN FILE CARICATO ONLINE</div>
+        </div>
+        <div class="hero-visual" aria-label="Tre immagini dal tuo archivio">
+          <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+          <div class="hero-card hero-card-back" id="hero-back"></div>
+          <div class="hero-card hero-card-middle" id="hero-middle"></div>
+          <div class="hero-card hero-card-front" id="hero-front"></div>
+          <span class="hero-side-note">UNA PARTE DEL TUO ARCHIVIO — 01 / 03</span>
+        </div>
+        <div class="hero-vertical" aria-hidden="true">SCOPRI LE TUE IMMAGINI <span>↓</span></div>
+      </section>
+
+      <div class="ticker" aria-hidden="true"><div class="ticker-inner">PER CHI AMA LE STORIE <span>✳</span> NON SOLO I FINALI <span>✳</span> PER CHI AMA LE STORIE <span>✳</span> NON SOLO I FINALI <span>✳</span></div></div>
+
+      <section class="intro section-shell" id="manifesto">
+        <div class="section-index">01 / IL TUO ARCHIVIO</div>
+        <div class="intro-content"><h2>Alcune storie non finiscono <em>con i titoli di coda.</em></h2><div class="intro-bottom"><p>Qui dentro trovi le foto che hai già raccolto, organizzate per cartella e film. Nessuna grafica inventata: sfoglia le tue immagini e scegli quelle che preferisci.</p><span class="asterisk" aria-hidden="true">✳</span></div></div>
+      </section>
+
+      <section class="collection section-shell" id="collezione" aria-labelledby="collection-title">
+        <div class="collection-heading"><div><div class="section-index">02 / LE TUE IMMAGINI</div><h2 id="collection-title">Scegli il tuo <em>prossimo poster.</em></h2></div><p>Tutte le immagini da E:\POSTERZ. Cerca per titolo, cartella o nome del file.</p></div>
+        <div class="collection-toolbar">
+          <div class="category-tabs" id="category-tabs" role="group" aria-label="Filtra per cartella"></div>
+          <div class="toolbar-right"><label class="search-field" for="catalog-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="catalog-search" type="search" placeholder="Film o nome del file..." autocomplete="off" /></label><select id="film-filter" aria-label="Filtra per film"><option value="tutti">Tutti i film</option></select></div>
+        </div>
+        <div class="results-meta"><span id="results-count" role="status" aria-live="polite">Caricamento immagini…</span><button id="clear-filters" type="button" hidden>Rimuovi filtri ×</button></div>
+        <div class="product-grid" id="product-grid"></div>
+        <div class="collection-end"><span>✳</span><p>Le foto originali rimangono <em>nelle tue cartelle.</em></p></div>
+      </section>
+
+      <section class="editorial" id="come-funziona"><div class="editorial-copy"><span class="section-index">03 / COME USARLO</span><h2>Dalle tue cartelle<br />alla <em>tua maglietta.</em></h2><p>Un catalogo tutto tuo: scegli l’immagine, confronta come starebbe su maglietta, felpa o poster e apri il file originale per preparare la stampa.</p><div class="editorial-steps"><div><span>01</span><strong>Cerca</strong><p>Filtra per cartella, film o nome del file.</p></div><div><span>02</span><strong>Prova</strong><p>Guarda l’anteprima sui vari supporti.</p></div><div><span>03</span><strong>Apri</strong><p>Ritrova l’originale alla risoluzione disponibile.</p></div></div></div><div class="editorial-art"><div class="editorial-frame" id="editorial-frame"></div><span class="editorial-art-caption">DAL TUO ARCHIVIO PERSONALE · E:\POSTERZ</span></div></section>
+
+      <section class="closing section-shell"><span class="section-index">04 / IL TUO SPAZIO</span><h2>Ci vediamo <em>alla prossima scena.</em></h2><p>Questo sito gira sul tuo computer. Le foto originali rimangono nel tuo archivio e le miniature vengono generate solo in questa cartella.</p><a class="button button-dark" href="#collezione">Torna ai poster <span aria-hidden="true">↗</span></a></section>
+    </main>
+
+    <footer class="footer"><div class="footer-top"><a class="brand footer-brand" href="#inizio"><span class="brand-symbol" aria-hidden="true">✳</span><span>fuori<span class="brand-break">campo</span><span class="brand-dot">.</span></span></a><p>Il tuo archivio di cinema.<br />Locale, privato e fatto con le tue immagini.</p><a href="#inizio" class="back-to-top">TORNA SU ↑</a></div><div class="footer-bottom"><span>© 2026 FUORI CAMPO — ARCHIVIO PERSONALE</span><span>NESSUN UPLOAD · NESSUN ACQUISTO · NESSUNA AFFILIAZIONE CON GLI STUDI</span></div></footer>
+
+    <dialog id="product-dialog" class="product-dialog" aria-labelledby="dialog-title"><button type="button" class="dialog-close" id="dialog-close" aria-label="Chiudi anteprima">×</button><div id="dialog-content"></div></dialog>
+  </body>
+</html>

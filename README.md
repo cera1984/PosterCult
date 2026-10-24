@@ -1,0 +1,30 @@
+# Fuori Campo — archivio personale
+
+Apri **`E:\POSTERZ\site\index.html`** nel browser. Non occorrono account né connessione internet. Il sito non invia foto online e non offre acquisti.
+
+Sono catalogate tutte le immagini reali presenti nelle cartelle di `E:\POSTERZ`. Puoi cercare per film o file, filtrare per cartella e, dentro **Altri film**, per sottosezione (`ITALIANI`, `DARIO ARGENTO`, `NOSFERATU`, ecc.). Puoi salvare i preferiti e provare visivamente ciascuna immagine su maglietta, felpa e poster. La preview di maglietta/felpa è interattiva: trascina il capo per inclinarlo e vedere come la grafica segue il busto, con ombre, cuciture e pieghe. Dalla scheda puoi aprire **il file originale**, senza modificarlo. Le anteprime non sono file di stampa e non garantiscono la resa finale: controlla le dimensioni e chiedi allo stampatore il formato richiesto. Alcuni originali sono JPG/WebP e non necessariamente lossless.
+
+Le miniature in `site\thumbs` sono copie leggere per sfogliare la galleria; gli originali restano nelle loro cartelle. I preferiti sono salvati solo nel browser del computer.
+
+## Aggiungere nuove foto
+
+Metti le immagini in una cartella **dentro `E:\POSTERZ`, ma fuori da `site`**. Per aggiornare catalogo e miniature, esegui:
+
+```powershell
+py "E:\POSTERZ\site\generate_catalog.py"
+```
+
+Richiede Python e Pillow (`py -m pip install Pillow` solo se non è già installato). Gli originali non vengono toccati. Se sposti tutto l'archivio in un altro posto, mantieni la cartella `site` come sottocartella dell'archivio e rigenera il catalogo. Apri la pagina come file locale, non tramite un server che espone solo `site`, altrimenti i collegamenti agli originali nelle cartelle superiori potrebbero non funzionare.
+
+Uso pensato per la consultazione privata. Se in futuro vorrai pubblicare o vendere prodotti con poster di film, verifica prima i diritti necessari.
+
+## Pubblicare su GitHub Pages
+
+Il pacchetto `site` è già autosufficiente: include `assets\originals`, le miniature e `.nojekyll`. Questo significa che, una volta pubblicato, anche gli amici con il link vedranno le immagini. **Non è un accesso protetto**: chiunque riceva il link può salvare le immagini mostrate.
+
+1. Crea su GitHub un repository vuoto, per esempio `posterz-privato`.
+2. Carica tutto il contenuto della cartella `E:\POSTERZ\site` nella radice del repository (non la cartella `site` dentro un'altra cartella).
+3. In GitHub apri `Settings → Pages`, scegli `Deploy from a branch`, branch `main`, cartella `/ (root)`, quindi salva.
+4. Dopo qualche minuto l'indirizzo sarà `https://TUO-USERNAME.github.io/posterz-privato/`.
+
+GitHub consente file singoli fino a 100 MB; il pacchetto attuale è circa 72 MB complessivi. Per aggiornare le immagini: aggiungile nell'archivio, esegui `py "E:\POSTERZ\site\generate_catalog.py"`, poi ricarica su GitHub `gallery-data.js`, `thumbs` e `assets`.
