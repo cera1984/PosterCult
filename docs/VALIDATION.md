@@ -1,15 +1,15 @@
 # Verifica del prototipo — 25 ottobre 2026
 
-Base dell'affinamento visivo: `ba1119c` (main, primo configuratore pubblicato).
+Base della revisione di proporzioni e scala della grafica: `112aa24`.
 
 ## Eseguito e superato
 
 - `node --check app.js` e `node --check tshirt-viewer.js`.
-- `npm test`: **2/2**, integrità/hash del GLB e della fonte CC0, controllo UV,
+- `npm test`: **4/4**, integrità/hash del GLB e della fonte CC0, controllo UV,
   validazione Khronos e disponibilità di originali/miniature di tutte le **270 immagini**.
 - Khronos glTF Validator: **0 errori, 0 warning**, una nota informativa sulle
   UV non usate da texture interne al GLB (il viewer usa una decal indipendente).
-- `npm run test:browser`: **9/9**, Chromium 141.0.7390.37, Playwright 1.56.1,
+- `npm run test:browser`: **11/11**, Chromium 141.0.7390.37, Playwright 1.56.1,
   Windows, rendering WebGL con SwiftShader.
 - Test sotto `/PosterCult/`, per controllare import, asset e URL del catalogo
   in una sottocartella come GitHub Pages.
@@ -36,6 +36,16 @@ Base dell'affinamento visivo: `ba1119c` (main, primo configuratore pubblicato).
 9. Grafica 2001 a 17° e zoom ravvicinato: rendering della trama e dei dettagli,
    nessun errore WebGL/GLSL segnalato nella console. Anche il test desktop
    controlla gli errori di compilazione dei materiali.
+10. Percentuali rapide 100/150/200, scala libera 275 e limiti 25/300:
+    dimensioni proporzionali, nessun nuovo download della grafica, conservazione
+    della percentuale cambiando immagine e ripristino al 100% riaprendo la vista.
+11. Cambio scala durante il download di una nuova immagine: la nuova grafica
+    usa l'ultima percentuale impostata. Anche il test mobile prova il 200%.
+
+Due test unitari dedicati verificano proporzioni e limiti della grafica per
+immagini verticali, orizzontali e quadrate. Il modello verifica anche il nuovo
+rapporto larghezza/altezza e la vista browser parte da almeno 4,45 unità di
+distanza, adattandosi al riquadro per lasciare margine attorno al capo.
 
 Il test del GLB ora verifica anche i quattro bordi aperti dopo caricamento
 del modello indicizzato (collo, fondo e due maniche), e il limite di peso.

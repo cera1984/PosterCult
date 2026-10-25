@@ -39,9 +39,9 @@ async function startTshirtViewer(item) {
   const generation = viewerGeneration;
   const host = dialogContent.querySelector('.tshirt-viewer');
   try {
-    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=realism-1');
+    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=fit-scale-1');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
-    tshirtViewer = mountTshirtViewer(host, item);
+    tshirtViewer = mountTshirtViewer(host, item, { scalePanel: dialogContent.querySelector('[data-print-controls]') });
     dialogContent.querySelector('#tshirt-artwork').disabled = false;
   } catch {
     if (generation === viewerGeneration && host.isConnected) {
@@ -173,6 +173,7 @@ function setupTshirtDialog(item) {
   const choices = document.createElement('div');
   choices.className = 'tshirt-catalog';
   choices.innerHTML = `<label for="tshirt-artwork">Grafica dal catalogo</label><select id="tshirt-artwork" disabled>${images.map(image => `<option value="${escapeHtml(image.id)}" ${image.id === item.id ? 'selected' : ''}>${escapeHtml(image.film)} — ${escapeHtml(image.filename)}</option>`).join('')}</select><p class="dialog-note">Taglio boxy indicativo, stampa frontale a proporzioni conservate. Nessuna simulazione di taglia, tessuto o file di stampa.</p>`;
+  choices.insertAdjacentHTML('beforeend', `<fieldset class="print-size-controls" data-print-controls disabled><legend id="print-size-label">Dimensione grafica <output for="tshirt-print-size" aria-live="polite">100%</output></legend><input id="tshirt-print-size" data-print-range type="range" min="25" max="300" step="5" value="100" aria-labelledby="print-size-label" /><div class="print-size-presets" role="group" aria-label="Percentuali rapide">${[100, 150, 200].map(value => `<button type="button" data-print-scale="${value}" aria-pressed="${value === 100}">${value}%</button>`).join('')}</div><p>Da 25% a 300%. Oltre i bordi del capo, la grafica viene ritagliata.</p></fieldset>`);
   dialogContent.querySelector('.variant-list').after(choices);
   startTshirtViewer(item);
 }

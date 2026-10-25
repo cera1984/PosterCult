@@ -21,6 +21,8 @@ test('self-contained GLB passes Khronos validation and recorded hash', async () 
   assert.equal(report.uv.count, report.vertices);
   assert.equal(report.boundaries, 4, 'neckline, two sleeves and hem remain open');
   assert.ok(report.bytes < 1500000, 'detailed model must remain light enough for the static site');
+  const width = report.bounds.max[0] - report.bounds.min[0], height = report.bounds.max[1] - report.bounds.min[1];
+  assert.ok(width / height < 1.1, 'relaxed shirt must no longer have the previous wide square silhouette');
   const loaded = await new GLTFLoader().parseAsync(new Uint8Array(bytes).buffer, '');
   assert.equal(boundaryLoops(loaded.scene.children[0].geometry).length, 4, 'indexed GLB boundaries must generate collar and hems');
   assert.equal(report.uv.degenerateTriangles, 0);
