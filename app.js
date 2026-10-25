@@ -1,6 +1,6 @@
 // Catalogo privato generato da generate_catalog.py: le immagini restano sull'SSD.
 const images = Array.isArray(window.POSTERZ_IMAGES) ? window.POSTERZ_IMAGES : [];
-const productTypes = { originale: 'Immagine', poster: 'Poster', magliette: 'Maglietta', felpe: 'Felpa' };
+const productTypes = { poster: 'Poster', originale: 'Immagine originale' };
 const grid = document.getElementById('product-grid');
 const searchInput = document.getElementById('catalog-search');
 const filmFilter = document.getElementById('film-filter');
@@ -20,7 +20,7 @@ try {
 let category = 'tutti';
 let onlyFavorites = false;
 let selectedImage = null;
-let selectedType = 'magliette';
+let selectedType = 'poster';
 let subgroup = 'tutte';
 
 function escapeHtml(value) {
@@ -107,7 +107,7 @@ function render() {
       <div class="product-visual">
         <span class="product-tag">${escapeHtml(item.group)}</span>
         <button class="favorite-button ${favorites.has(item.id) ? 'is-favorite' : ''}" type="button" data-favorite="${item.id}" aria-label="${favorites.has(item.id) ? 'Rimuovi' : 'Aggiungi'} ${escapeHtml(item.filename)} ${favorites.has(item.id) ? 'dai' : 'ai'} preferiti" aria-pressed="${favorites.has(item.id)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20.5 8.6c0 4.7-8.5 10-8.5 10s-8.5-5.3-8.5-10a4.6 4.6 0 0 1 8.5-2.3 4.6 4.6 0 0 1 8.5 2.3Z"/></svg></button>
-        <div class="product-open" role="button" tabindex="0" data-open="${item.id}" aria-label="Apri ${escapeHtml(item.filename)} e provalo sui prodotti">${mockup(item, 'poster')}</div>
+        <div class="product-open" role="button" tabindex="0" data-open="${item.id}" aria-label="Apri il poster ${escapeHtml(item.filename)}">${mockup(item, 'poster')}</div>
       </div>
       <div class="product-details"><div><h3>${escapeHtml(item.film)}</h3><p title="${escapeHtml(item.filename)}">${escapeHtml(item.filename)}</p></div><span class="product-price">${item.width} × ${item.height}</span></div>
     </article>`).join('') : `<div class="empty-state"><span aria-hidden="true">✳</span><h3>${onlyFavorites && favorites.size === 0 ? 'Nessun preferito, per ora.' : 'Nessuna immagine trovata.'}</h3><p>${onlyFavorites && favorites.size === 0 ? 'Tocca il cuore su una foto per ritrovarla qui.' : 'Prova un’altra ricerca o rimuovi i filtri.'}</p><button type="button" id="empty-reset">Mostra tutte le immagini</button></div>`;
@@ -134,13 +134,13 @@ function toggleFavorite(id) {
 function renderDialog() {
   if (!selectedImage) return;
   const item = selectedImage;
-  dialogContent.innerHTML = `<div class="dialog-layout"><div class="dialog-preview">${mockup(item, selectedType, true, false)}</div><div class="dialog-info"><span class="section-index">${escapeHtml(item.group)} / ${escapeHtml(item.folder)}</span><h2 id="dialog-title">${escapeHtml(item.film)}</h2><p class="dialog-description">${escapeHtml(item.filename)}<br />${item.width} × ${item.height} pixel · ${escapeHtml(item.filename.split('.').pop().toUpperCase())}</p><p class="dialog-label">VEDI LA TUA IMMAGINE SU</p><div class="variant-list" role="group" aria-label="Seleziona anteprima">${Object.entries(productTypes).map(([type, label]) => `<button class="variant-button ${selectedType === type ? 'is-selected' : ''}" type="button" data-variant="${type}" aria-pressed="${selectedType === type}">${label}</button>`).join('')}</div><p class="dialog-price">Il file originale è nel tuo archivio.</p><a class="button button-dark original-link" href="${escapeHtml(fileUrl(item.original))}" target="_blank" rel="noopener">Apri il file originale <span aria-hidden="true">↗</span></a><p class="dialog-note">Le anteprime servono a immaginare il risultato: non modificano il file e non sono file pronti per la stampa. Verifica risoluzione e formato con chi stampa.</p></div></div>`;
+  dialogContent.innerHTML = `<div class="dialog-layout"><div class="dialog-preview">${mockup(item, selectedType, true, false)}</div><div class="dialog-info"><span class="section-index">${escapeHtml(item.group)} / ${escapeHtml(item.folder)}</span><h2 id="dialog-title">${escapeHtml(item.film)}</h2><p class="dialog-description">${escapeHtml(item.filename)}<br />${item.width} × ${item.height} pixel · ${escapeHtml(item.filename.split('.').pop().toUpperCase())}</p><p class="dialog-label">VISUALIZZAZIONE DEL POSTER</p><div class="variant-list" role="group" aria-label="Seleziona anteprima">${Object.entries(productTypes).map(([type, label]) => `<button class="variant-button ${selectedType === type ? 'is-selected' : ''}" type="button" data-variant="${type}" aria-pressed="${selectedType === type}">${label}</button>`).join('')}</div><p class="dialog-price">Il file originale è nel tuo archivio.</p><a class="button button-dark original-link" href="${escapeHtml(fileUrl(item.original))}" target="_blank" rel="noopener">Apri il file originale <span aria-hidden="true">↗</span></a><p class="dialog-note">Le anteprime servono a immaginare il risultato: non modificano il file e non sono file pronti per la stampa. Verifica risoluzione e formato con chi stampa.</p></div></div>`;
 }
 
 function openDialog(id) {
   selectedImage = images.find(item => item.id === id);
   if (!selectedImage) return;
-  selectedType = 'magliette';
+  selectedType = 'poster';
   renderDialog();
   dialog.showModal();
   document.body.classList.add('dialog-open');
