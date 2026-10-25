@@ -1,0 +1,5 @@
+# Preserve downloaded license evidence and source SHA-256 on Windows checkouts.
+assets/models/source/* -text
+assets/models/CC0-1.0.txt -text
+*.glb binary
+*.png binary

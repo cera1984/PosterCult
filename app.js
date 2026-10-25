@@ -188,6 +188,7 @@ function toggleFavorite(id) {
 }
 
 function renderDialog() {
+  disposeTshirtViewer();
   if (!selectedImage) return;
   const item = selectedImage;
   const isGarment = selectedType === 'magliette' || selectedType === 'felpe';
@@ -223,7 +224,7 @@ function renderDialog() {
 function openDialog(id) {
   selectedImage = images.find(item => item.id === id);
   if (!selectedImage) return;
-  selectedType = 'magliette';
+  selectedType = 'poster';
   renderDialog();
   dialog.showModal();
   document.body.classList.add('dialog-open');

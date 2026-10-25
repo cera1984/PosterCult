@@ -1,5 +1,21 @@
 # Fuori Campo — archivio personale
 
+## Prototipo T-shirt 3D
+
+Nella scheda di ogni poster è disponibile **T-shirt 3D**: rotazione a 360°,
+zoom, bianco/nero e scelta della grafica dal catalogo. La vista poster resta
+quella predefinita. Per il 3D aprire il sito da GitHub Pages oppure eseguire
+`npm ci` e `npm run serve`, quindi visitare `http://127.0.0.1:4173/`.
+La modalità `file://` descritta sotto supporta il catalogo, ma non il 3D.
+
+Modello CC0 acquisito da MakeHuman e adattato boxy; anteprima indicativa,
+senza simulazione di vestibilità o file di stampa. [Fonte, licenza, UV e
+limiti](docs/T-SHIRT-3D.md). [Risultati dei test](docs/VALIDATION.md).
+
+Le istruzioni seguenti descrivono l'archivio locale originale; le vecchie
+anteprime di felpa/maglietta inclinate sono state sostituite dal prototipo
+3D della sola T-shirt.
+
 Apri **`E:\POSTERZ\site\index.html`** nel browser. Non occorrono account né connessione internet. Il sito non invia foto online e non offre acquisti.
 
 Sono catalogate tutte le immagini reali presenti nelle cartelle di `E:\POSTERZ`. Puoi cercare per film o file, filtrare per cartella e, dentro **Altri film**, per sottosezione (`ITALIANI`, `DARIO ARGENTO`, `NOSFERATU`, ecc.). Puoi salvare i preferiti e provare visivamente ciascuna immagine su maglietta, felpa e poster. La preview di maglietta/felpa è interattiva: trascina il capo per inclinarlo e vedere come la grafica segue il busto, con ombre, cuciture e pieghe. Dalla scheda puoi aprire **il file originale**, senza modificarlo. Le anteprime non sono file di stampa e non garantiscono la resa finale: controlla le dimensioni e chiedi allo stampatore il formato richiesto. Alcuni originali sono JPG/WebP e non necessariamente lossless.
@@ -7,6 +23,11 @@ Sono catalogate tutte le immagini reali presenti nelle cartelle di `E:\POSTERZ`.
 Le miniature in `site\thumbs` sono copie leggere per sfogliare la galleria; gli originali restano nelle loro cartelle. I preferiti sono salvati solo nel browser del computer.
 
 ## Aggiungere nuove foto
+
+Dopo la rigenerazione, `node scripts/check-catalog.mjs` verifica che tutti i
+percorsi coincidano esattamente con i nomi registrati in Git, comprese le
+maiuscole/minuscole: GitHub Pages le distingue anche quando Windows non lo fa.
+I nuovi file devono essere aggiunti a Git prima di questo controllo.
 
 Metti le immagini in una cartella **dentro `E:\POSTERZ`, ma fuori da `site`**. Per aggiornare catalogo e miniature, esegui:
 

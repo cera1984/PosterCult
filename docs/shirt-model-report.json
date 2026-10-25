@@ -1,0 +1,53 @@
+{
+  "source": "assets/models/source/crude_male_shirt.obj",
+  "sourceSha256": "3389b981a826396213cce2e69f40b3d9eca6cdfadcfcbee2774acb1dfb322fa7",
+  "outputSha256": "20a6b30d3a19f887299c67e2bcb1579babbc96dad356f04f0f494c374812d9ef",
+  "bytes": 743732,
+  "triangles": 33088,
+  "vertices": 16998,
+  "expandedVertices": 99264,
+  "boundaries": 4,
+  "bounds": {
+    "min": [
+      -0.8834946751594543,
+      -0.8251222372055054,
+      -0.21859419345855713
+    ],
+    "max": [
+      0.8835362195968628,
+      0.8178010582923889,
+      0.22481772303581238
+    ]
+  },
+  "uv": {
+    "count": 16998,
+    "ranges": [
+      [
+        0.00009999999747378752,
+        0.5638999938964844
+      ],
+      [
+        0.00009999999747378752,
+        0.9998999834060669
+      ]
+    ],
+    "finite": true,
+    "degenerateTriangles": 0,
+    "overlap": "Not certified; printing uses separate front-only projected decal UVs."
+  },
+  "adaptation": {
+    "height": 1.55,
+    "widthMultiplier": 1.22,
+    "depthMultiplier": 0.58,
+    "bodyTargetHalfWidth": 0.64,
+    "outerSleeveDrop": 0.1,
+    "neckline": "narrower with raised front",
+    "detail": "two midpoint subdivisions, boundary smoothing, static analytic folds",
+    "units": "preview units, not garment measurements",
+    "finalProportions": {
+      "widthMultiplier": 0.88,
+      "heightMultiplier": 1.06,
+      "waistReduction": 0.035
+    }
+  }
+}

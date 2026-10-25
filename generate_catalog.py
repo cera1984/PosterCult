@@ -65,6 +65,24 @@ def film_title(parts, stem):
     return clean_name(stem)
 
 
+def canonical_destination(root, relative):
+    """Reuse the exact spelling of existing output files, also on Windows."""
+    current = root
+    for part in relative.parts:
+        children = list(current.iterdir()) if current.is_dir() else []
+        exact = next((child for child in children if child.name == part), None)
+        matches = [child for child in children if child.name.casefold() == part.casefold()]
+        if exact is not None:
+            current = exact
+        elif len(matches) == 1:
+            current = matches[0]
+        elif len(matches) > 1:
+            raise ValueError(f"Nomi ambigui in {current}: {part}")
+        else:
+            current = current / part
+    return current
+
+
 def main():
     parser = argparse.ArgumentParser(description="Sincronizza l'archivio poster nel sito locale.")
     parser.add_argument("--archive", type=Path, default=Path(r"E:\POSTERZ"), help="Cartella sorgente dell'archivio")
@@ -95,7 +113,7 @@ def main():
                     preview = ImageOps.exif_transpose(image)
                     preview.thumbnail((540, 760), Image.Resampling.LANCZOS)
                     preview.convert("RGB").save(thumb_path, "WEBP", quality=80, method=5)
-            online_path = originals / rel
+            online_path = canonical_destination(originals, rel)
             online_path.parent.mkdir(parents=True, exist_ok=True)
             if not online_path.exists() or online_path.stat().st_mtime < path.stat().st_mtime:
                 shutil.copy2(path, online_path)
@@ -112,7 +130,7 @@ def main():
             "subgroup": subgroup,
             "filename": path.name,
             "folder": " / ".join(parts[:-1]),
-            "original": "assets/originals/" + "/".join(parts),
+            "original": online_path.relative_to(output).as_posix(),
             "thumbnail": "thumbs/" + thumb_name,
             "width": width,
             "height": height,
