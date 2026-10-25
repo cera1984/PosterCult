@@ -3,7 +3,8 @@ import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControl
 import { GLTFLoader } from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
 import { DecalGeometry } from './vendor/three/examples/jsm/geometries/DecalGeometry.js';
 import { RoomEnvironment } from './vendor/three/examples/jsm/environments/RoomEnvironment.js';
-import { cottonMaterial, garmentTrims, setCottonColor } from './garment-material.js';
+import { cottonMaterial, garmentTrims, setCottonColor } from './garment-material.js?v=catalog-restore-1';
+import { GARMENT_COLORS } from './garment-palette.js';
 import { normalizePrintScale, printDimensions } from './print-layout.js';
 
 const modelUrl = new URL('./assets/models/boxy-shirt.glb?v=fit-scale-1', import.meta.url).href;
@@ -63,11 +64,11 @@ export function mountTshirtViewer(host, initialItem, { scalePanel } = {}) {
     if (button.dataset.view === 'back') setView(true);
     if (button.dataset.view === 'in') zoom(1 / 1.15);
     if (button.dataset.view === 'out') zoom(1.15);
-    if (button.dataset.view === 'white' || button.dataset.view === 'black') {
+    if (Object.hasOwn(GARMENT_COLORS, button.dataset.view)) {
       const color = button.dataset.view;
       setCottonColor([shirt, trims], color);
       host.dataset.color = color;
-      host.querySelectorAll('[data-view="white"], [data-view="black"]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+      host.querySelectorAll('[data-view="white"], [data-view="black"], [data-view="grey"], [data-view="vintage"]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
       render();
     }
   };

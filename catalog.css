@@ -1,0 +1,9 @@
+.collection-toolbar{display:block;padding-bottom:18px}.category-tabs{display:block;overflow:visible;white-space:normal;width:100%}
+.catalog-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;align-items:end}
+.catalog-folder-levels{display:contents}.catalog-field{min-width:0}.catalog-field[hidden]{display:none}
+.catalog-field label{display:block;font-size:12px;font-weight:600;margin-bottom:7px;color:#465044}
+.catalog-field select{display:block;width:100%;max-width:none;min-height:46px;padding:10px 30px 10px 12px;border:1px solid #b8bdad;background:#f7f4ea;border-radius:3px;font-size:13px;text-overflow:ellipsis}
+.catalog-path{margin:13px 0 0;min-height:18px;font-size:12px;line-height:1.6;color:#737b6d;overflow-wrap:anywhere}
+.collection-toolbar .toolbar-right{margin-top:14px;padding:0;width:100%;display:block}.collection-toolbar .search-field{width:100%;max-width:570px}.collection-toolbar .search-field input{width:100%;min-height:40px;font-size:14px}
+.tshirt-controls{gap:8px}.tshirt-controls button[data-view=vintage]{background:#d6c5aa;color:#332a20}
+@media(max-width:600px){.catalog-controls{grid-template-columns:1fr}.collection-toolbar{margin-top:28px}.catalog-field select{font-size:16px}.catalog-path{font-size:11px}}

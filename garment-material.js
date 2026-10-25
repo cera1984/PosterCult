@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { boundaryLoops, garmentTopology } from './garment-geometry.js';
+import { GARMENT_COLORS } from './garment-palette.js';
 
 export function cottonMaterial(role = 'body') {
   const material = new THREE.MeshPhysicalMaterial({ roughness: .9, metalness: 0, side: THREE.DoubleSide, sheen: .28, sheenRoughness: .9, sheenColor: '#aaa79f', specularIntensity: .24 });
@@ -29,13 +30,14 @@ export function cottonMaterial(role = 'body') {
 }
 
 export function setCottonColor(objects, color) {
-  const base = new THREE.Color(color === 'white' ? '#ece9e1' : '#242629');
+  const palette = GARMENT_COLORS[color] || GARMENT_COLORS.white;
+  const base = new THREE.Color(palette.base);
   for (const root of objects) root?.traverse(object => {
     const material = object.material;
-    if (!material?.userData.fabricRole) return;
+    if (!material?.userData.fabricRole || material.userData.fabricRole === 'ink') return;
     const role = material.userData.fabricRole;
     material.color.copy(base).multiplyScalar(role === 'rib' ? .91 : role === 'thread' ? .79 : 1);
-    if (material.sheenColor) material.sheenColor.set(color === 'white' ? '#b8b3a7' : '#575960');
+    if (material.sheenColor) material.sheenColor.set(palette.sheen);
   });
 }
 

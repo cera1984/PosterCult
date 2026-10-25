@@ -2,7 +2,9 @@
 
 Aprire il sito via HTTP/HTTPS, selezionare un poster e scegliere **T-shirt 3D**.
 Trascinare per ruotare senza limiti sull'asse verticale; usare rotella/pizzico o i
-pulsanti per lo zoom. Sono disponibili bianco, nero, fronte e retro. Il menu
+pulsanti per lo zoom. Sono disponibili bianco, nero, grigio, panna vintage,
+fronte e retro. I colori cambiano tessuto, colletto e orli senza tingere la
+grafica. Il menu
 **Grafica dal catalogo** cambia la stampa senza ricreare il visualizzatore.
 La selezione della grafica non cambia il titolo e il link del poster aperto.
 

@@ -1,15 +1,18 @@
 # Verifica del prototipo — 25 ottobre 2026
 
-Base della correzione dei percorsi: `066531b`.
+Base del ripristino: `6a984e9`, con catalogo e categorie dell'utente conservati.
+Interfaccia, poster e integrazione 3D recuperati da `d39b1b3`, poi aggiornati
+con filtri a cascata e quattro colori del tessuto.
 
 ## Eseguito e superato
 
 - `node --check app.js` e `node --check tshirt-viewer.js`.
-- `npm test`: **4/4**, integrità/hash del GLB e della fonte CC0, controllo UV,
-  validazione Khronos e disponibilità di originali/miniature di tutte le **270 immagini**.
+- `npm test`: **7/7**, integrità/hash del GLB e della fonte CC0, controllo UV,
+  validazione Khronos, filtri annidati, palette senza tinta sulla grafica e
+  disponibilità di originali/miniature di tutte le **346 immagini**.
 - Khronos glTF Validator: **0 errori, 0 warning**, una nota informativa sulle
   UV non usate da texture interne al GLB (il viewer usa una decal indipendente).
-- `npm run test:browser`: **12/12**, Chromium 141.0.7390.37, Playwright 1.56.1,
+- `npm run test:browser`: **15/15**, Chromium 141.0.7390.37, Playwright 1.56.1,
   Windows, rendering WebGL con SwiftShader.
 - Test sotto `/PosterCult/`, per controllare import, asset e URL del catalogo
   in una sottocartella come GitHub Pages.
@@ -44,6 +47,20 @@ Base della correzione dei percorsi: `066531b`.
 12. `sopranos2.webp`: poster caricato, link originale con cartella `sopranos`,
     stampa 3D pronta e controllo 200% attivo. Il percorso con `SOPRANOS`
     restituisce 404 anche nel server di test Windows.
+13. Categorie attuali conservate, nessuna sezione Others, conteggi aggiornati,
+    Italiani → Antonioni → Blow Up, reset dei livelli cambiando categoria,
+    ricerca Fahrenheit 451 e chiusura del dialog con il pulsante.
+14. Home con immagini contenute, ricerca dall'intestazione, filtro preferiti,
+    menu mobile e assenza di scorrimento orizzontale del catalogo.
+15. Bianco, nero, grigio e panna vintage producono quattro render diversi
+    mantenendo grafica e scala al 150%, senza ricaricare immagine o modello.
+
+`gallery-data.js`, `generate_catalog.py`, originali e miniature non sono stati
+modificati rispetto a `6a984e9`: categorie, ID, nomi e 76 immagini aggiunte
+dall'utente dopo la precedente verifica restano conservati. I menu seguono
+tutti i livelli delle cartelle reali e nascondono il selettore Film quando
+duplicherebbe l'unico film già scelto. Anche i comandi 3D restano interamente
+all'interno della vista mobile.
 
 ## Correzione dei percorsi del catalogo
 
@@ -52,7 +69,7 @@ diverse dai nomi registrati in Git. Non mancavano le immagini: erano gli URL
 del catalogo a differire dai nomi pubblicati. La verifica precedente con
 `fs.access` su Windows non rilevava questa differenza; il test ora confronta
 tutti i percorsi esattamente con quelli di Git. `node scripts/check-catalog.mjs`
-riporta 270 immagini, zero percorsi discordanti e zero file mancanti.
+riporta ora 346 immagini, zero percorsi discordanti e zero file mancanti.
 
 Il server locale ora riproduce la distinzione tra maiuscole e minuscole per
 originali e miniature. La rigenerazione del catalogo riusa la grafia effettiva

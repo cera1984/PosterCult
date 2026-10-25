@@ -3,7 +3,7 @@
 ## Prototipo T-shirt 3D
 
 Nella scheda di ogni poster è disponibile **T-shirt 3D**: rotazione a 360°,
-zoom, bianco/nero e scelta della grafica dal catalogo. La vista poster resta
+zoom, bianco/nero/grigio/panna vintage e scelta della grafica dal catalogo. La vista poster resta
 quella predefinita. Per il 3D aprire il sito da GitHub Pages oppure eseguire
 `npm ci` e `npm run serve`, quindi visitare `http://127.0.0.1:4173/`.
 La modalità `file://` descritta sotto supporta il catalogo, ma non il 3D.
@@ -23,6 +23,11 @@ Sono catalogate tutte le immagini reali presenti nelle cartelle di `E:\POSTERZ`.
 Le miniature in `site\thumbs` sono copie leggere per sfogliare la galleria; gli originali restano nelle loro cartelle. I preferiti sono salvati solo nel browser del computer.
 
 ## Aggiungere nuove foto
+
+Il catalogo conserva le categorie dell'archivio e offre menu a cascata per
+categoria e sottocartelle, ricerca e conteggi aggiornati anche nei preferiti.
+La cartella tecnica `others` non compare come categoria generica: i suoi
+contenuti restano nelle categorie già assegnate, senza cancellare le immagini.
 
 Dopo la rigenerazione, `node scripts/check-catalog.mjs` verifica che tutti i
 percorsi coincidano esattamente con i nomi registrati in Git, comprese le
