@@ -6,19 +6,27 @@
 .product-visual .product-open { position: absolute; inset: 0; width: 100%; height: 100%; }
 .mockup-poster .poster-frame { display: grid; place-items: center; overflow: hidden; }
 .mockup-poster .poster-frame img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.garment-print { overflow: hidden; background: #f0eadf; }
-.garment-print img { width: 100%; height: 100%; display: block; object-fit: contain; }
 .garment-stage { width: 88%; height: 94%; display: grid; place-items: center; perspective: 900px; cursor: grab; position: relative; }
 .garment-stage:active { cursor: grabbing; }
 .garment-stage svg { width: 100%; height: 100%; overflow: visible; transform: rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)); transform-style: preserve-3d; transition: transform .18s ease-out; }
-.garment-base { fill: url(#fabric); fill: #e6ddd0; stroke: #b9ad9d; stroke-width: 2; }
-.garment-stage svg:before { content: ""; }
-.garment-seam { fill: none; stroke: #b5a896; stroke-width: 2; opacity: .9; }
-.garment-print-image { opacity: .9; mix-blend-mode: multiply; filter: saturate(.92) contrast(.94); }
-.garment-wrinkles { fill: none; stroke: #9a8e7e; stroke-width: 2.3; opacity: .27; stroke-linecap: round; }
+.garment-seam { fill: none; stroke: #8b8275; stroke-width: 2; opacity: .85; }
+.garment-print-image { opacity: .93; mix-blend-mode: multiply; filter: saturate(.94) contrast(.96); }
+.garment-wrinkles { fill: none; stroke: #786d5e; stroke-width: 2.2; opacity: .24; stroke-linecap: round; }
 .tilt-hint { position: absolute; bottom: 3%; left: 50%; transform: translateX(-50%); color: #586157; font: 9px var(--mono); letter-spacing: .08em; white-space: nowrap; opacity: .75; pointer-events: none; }
 .mockup-shirt .garment-stage, .mockup-hoodie .garment-stage { filter: drop-shadow(7px 13px 8px #27312835); }
-#subgroup-filter { border-left: 1px solid var(--line); padding-left: 15px; max-width: 225px; }
+
+/* Smart filters bar */
+.smart-filters { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; padding-bottom: 15px; width: 100%; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-group label { font: 10px var(--mono); letter-spacing: .08em; color: var(--muted); }
+.filter-group select { border: 1px solid var(--line); background: var(--paper); padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--ink); border-radius: 2px; max-width: 240px; outline-color: var(--rust); }
+
+/* Color picker buttons */
+.color-list { display: flex; gap: 10px; margin-bottom: 23px; }
+.color-button { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #bdafa0; padding: 0; box-shadow: 0 2px 6px #0002; transition: transform .2s, border-color .2s; }
+.color-button:hover { transform: scale(1.1); }
+.color-button.is-selected { border-color: var(--rust); transform: scale(1.12); box-shadow: 0 0 0 2px var(--cream), 0 0 0 4px var(--rust); }
+
 .original-preview { width: 100%; height: 100%; display: grid; place-items: center; padding: 7%; }
 .original-preview img { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 5px 12px 25px #17211b40; }
 .product-details { align-items: start; }
@@ -26,8 +34,7 @@
 .product-details h3 { overflow-wrap: anywhere; }
 .product-details p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
 .product-price { white-space: nowrap; }
-.category-tabs { overflow-x: auto; scrollbar-width: thin; flex: 1; min-width: 0; }
-.category-tabs .tab { flex: 0 0 auto; }
+.category-tabs { flex: 1; min-width: 0; }
 .toolbar-right { flex: 0 0 auto; }
 .dialog-info .section-index { overflow-wrap: anywhere; line-height: 1.6; }
 .dialog-info h2 { overflow-wrap: anywhere; font-size: clamp(29px, 3vw, 42px); }
@@ -38,9 +45,12 @@
 .dialog-info .original-link { align-self: stretch; }
 .dialog-info .dialog-note { margin-top: 16px; }
 .hero-copy h1 { white-space: normal; }
+
 @media (max-width: 760px) {
   .category-tabs { flex: 0 0 100%; width: 100%; }
   .toolbar-right { flex: 1 1 100%; }
+  .smart-filters { gap: 12px; }
+  .filter-group select { max-width: 100%; width: 100%; }
   .dialog-preview .mockup-original { min-height: 350px; }
   .dialog-preview .original-preview img { max-height: 310px; }
 }

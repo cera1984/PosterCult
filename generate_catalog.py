@@ -15,16 +15,54 @@ IGNORED_SOURCE_DIRS = {".git", "site", "sito", "assets", "thumbs"}
 DISPLAY_GROUPS = {
     "leon": "Léon",
     "sopranos": "I Soprano",
-    "others": "Altri film",
+    "tarantino": "Tarantino",
+    "kubrick": "Kubrick",
+    "carpenter": "Carpenter",
+    "marvel": "Marvel",
+    "disney": "Disney",
 }
 
 
+def clean_name(name):
+    return re.sub(r"[\s_-]+\d+$", "", name).replace("_", " ").title()
+
+
+def get_group_and_subgroup(parts):
+    # parts: ad es. ('CARPENTER', 'ESSI VIVONO', 'tl1.jpg')
+    # oppure ('others', 'ITALIANI', 'DARIO ARGENTO', 'SUSPIRIA', 'img.webp')
+    # oppure ('others', 'SCARFACE', 'img.webp')
+    top = parts[0].lower()
+    if top == "others":
+        if len(parts) > 2:
+            group = parts[1].replace("_", " ").title()
+            subgroup = parts[2].replace("_", " ").title() if len(parts) > 3 else ""
+        elif len(parts) == 2:
+            group = parts[1].replace("_", " ").title()
+            subgroup = ""
+        else:
+            group = "Collezione"
+            subgroup = ""
+    else:
+        group = DISPLAY_GROUPS.get(top, parts[0].replace("_", " ").title())
+        subgroup = parts[1].replace("_", " ").title() if len(parts) > 2 else ""
+    return group, subgroup
+
+
 def film_title(parts, stem):
-    if len(parts) >= 3:
-        return parts[-2]
-    if len(parts) == 2 and parts[0].lower() not in {"others", "marvel"}:
-        return DISPLAY_GROUPS.get(parts[0].lower(), parts[0])
-    return re.sub(r"[\s_-]*\d+$", "", stem).strip() or stem
+    top = parts[0].lower()
+    if top == "others":
+        if len(parts) >= 4:
+            return parts[-2].replace("_", " ").title()
+        elif len(parts) == 3:
+            return parts[1].replace("_", " ").title()
+        elif len(parts) == 2:
+            return parts[1].replace("_", " ").title()
+    else:
+        if len(parts) >= 3:
+            return parts[-2].replace("_", " ").title()
+        elif len(parts) == 2:
+            return parts[0].replace("_", " ").title()
+    return clean_name(stem)
 
 
 def main():
@@ -66,19 +104,11 @@ def main():
             continue
 
         parts = rel.parts
-        group_key = parts[0].lower()
-        if group_key == "others":
-            subgroup = parts[1] if len(parts) > 1 else "Altri"
-            # Per cartelle come others/ITALIANI/DARIO ARGENTO/film, la sezione
-            # mostrata all'utente è ITALIANI / DARIO ARGENTO.
-            if len(parts) > 3:
-                subgroup = f"{parts[1]} / {parts[2]}"
-        else:
-            subgroup = parts[1] if len(parts) > 2 else ""
+        group, subgroup = get_group_and_subgroup(parts)
         entries.append({
             "id": thumb_name[:-5],
             "film": film_title(parts, path.stem),
-            "group": DISPLAY_GROUPS.get(parts[0].lower(), parts[0]),
+            "group": group,
             "subgroup": subgroup,
             "filename": path.name,
             "folder": " / ".join(parts[:-1]),
@@ -88,7 +118,6 @@ def main():
             "height": height,
         })
 
-    # Il JS è un file locale: funziona anche aprendo index.html senza server.
     data = "window.POSTERZ_IMAGES = " + json.dumps(entries, ensure_ascii=False, separators=(",", ":")) + ";\n"
     (output / "gallery-data.js").write_text(data, encoding="utf-8")
     print(f"Catalogate {len(entries)} immagini; miniature in {thumbs}")
