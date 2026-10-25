@@ -24,6 +24,11 @@ Le miniature in `site\thumbs` sono copie leggere per sfogliare la galleria; gli 
 
 ## Aggiungere nuove foto
 
+Dopo la rigenerazione, `node scripts/check-catalog.mjs` verifica che tutti i
+percorsi coincidano esattamente con i nomi registrati in Git, comprese le
+maiuscole/minuscole: GitHub Pages le distingue anche quando Windows non lo fa.
+I nuovi file devono essere aggiunti a Git prima di questo controllo.
+
 Metti le immagini in una cartella **dentro `E:\POSTERZ`, ma fuori da `site`**. Per aggiornare catalogo e miniature, esegui:
 
 ```powershell

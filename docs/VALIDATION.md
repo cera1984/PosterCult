@@ -1,6 +1,6 @@
 # Verifica del prototipo — 25 ottobre 2026
 
-Base della revisione di proporzioni e scala della grafica: `112aa24`.
+Base della correzione dei percorsi: `066531b`.
 
 ## Eseguito e superato
 
@@ -9,7 +9,7 @@ Base della revisione di proporzioni e scala della grafica: `112aa24`.
   validazione Khronos e disponibilità di originali/miniature di tutte le **270 immagini**.
 - Khronos glTF Validator: **0 errori, 0 warning**, una nota informativa sulle
   UV non usate da texture interne al GLB (il viewer usa una decal indipendente).
-- `npm run test:browser`: **11/11**, Chromium 141.0.7390.37, Playwright 1.56.1,
+- `npm run test:browser`: **12/12**, Chromium 141.0.7390.37, Playwright 1.56.1,
   Windows, rendering WebGL con SwiftShader.
 - Test sotto `/PosterCult/`, per controllare import, asset e URL del catalogo
   in una sottocartella come GitHub Pages.
@@ -41,6 +41,24 @@ Base della revisione di proporzioni e scala della grafica: `112aa24`.
     della percentuale cambiando immagine e ripristino al 100% riaprendo la vista.
 11. Cambio scala durante il download di una nuova immagine: la nuova grafica
     usa l'ultima percentuale impostata. Anche il test mobile prova il 200%.
+12. `sopranos2.webp`: poster caricato, link originale con cartella `sopranos`,
+    stampa 3D pronta e controllo 200% attivo. Il percorso con `SOPRANOS`
+    restituisce 404 anche nel server di test Windows.
+
+## Correzione dei percorsi del catalogo
+
+Rilevati e corretti **205 riferimenti originali** con maiuscole/minuscole
+diverse dai nomi registrati in Git. Non mancavano le immagini: erano gli URL
+del catalogo a differire dai nomi pubblicati. La verifica precedente con
+`fs.access` su Windows non rilevava questa differenza; il test ora confronta
+tutti i percorsi esattamente con quelli di Git. `node scripts/check-catalog.mjs`
+riporta 270 immagini, zero percorsi discordanti e zero file mancanti.
+
+Il server locale ora riproduce la distinzione tra maiuscole e minuscole per
+originali e miniature. La rigenerazione del catalogo riusa la grafia effettiva
+dei file di destinazione, invece di copiarla dal percorso dell'archivio sorgente.
+Due test Python sul generatore sono passati (`python -m unittest discover -s
+tests -p test_catalog_generator.py`).
 
 Due test unitari dedicati verificano proporzioni e limiti della grafica per
 immagini verticali, orizzontali e quadrate. Il modello verifica anche il nuovo

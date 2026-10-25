@@ -234,3 +234,18 @@ test('changing print scale during an image download uses the latest scale', asyn
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-state', 'ready');
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-print-scale', '200');
 });
+
+test('Sopranos original, poster and 3D print use exact published path spelling', async ({ page }) => {
+  await page.goto('./');
+  await page.locator('#catalog-search').fill('sopranos2.webp');
+  await page.locator('[data-open]').first().click();
+  await page.waitForFunction(() => { const img = document.querySelector('.dialog-preview img'); return img?.complete && img.naturalWidth > 0; });
+  await expect(page.locator('.original-link')).toHaveAttribute('href', 'assets/originals/sopranos/sopranos2.webp');
+  expect((await page.request.get('assets/originals/sopranos/sopranos2.webp')).status()).toBe(200);
+  expect((await page.request.get('assets/originals/SOPRANOS/sopranos2.webp')).status()).toBe(404);
+  await page.getByRole('button', { name: 'T-shirt 3D', exact: true }).click();
+  await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-state', 'ready');
+  await page.getByRole('button', { name: '200%', exact: true }).click();
+  await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-print-scale', '200');
+  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/sopranos-path-fixed.png' });
+});
