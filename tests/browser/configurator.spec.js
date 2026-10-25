@@ -65,7 +65,7 @@ test('posters: search, original, favorites, keyboard dialog remain usable withou
   await page.locator('#catalog-search').fill('PULP FICTION');
   expect(await page.locator('[data-open]').count()).toBeLessThan(total);
   await page.locator('[data-open]').first().focus(); await page.keyboard.press('Enter');
-  await expect(page.locator('#dialog-title')).toContainText('PULP FICTION');
+  await expect(page.locator('#dialog-title')).toContainText(/pulp fiction/i);
   await page.getByRole('button', { name: 'Immagine originale', exact: true }).click();
   await expect.poll(() => page.locator('.original-preview img').evaluate(img => img.complete && img.naturalWidth > 0)).toBeTruthy();
   const url = await page.locator('.original-link').getAttribute('href');
@@ -81,6 +81,9 @@ test('mobile viewport: visible controls, canvas, no horizontal overflow', async 
   await page.setViewportSize({ width: 390, height: 844 });
   await openShirt(page);
   await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/mobile.png' });
+  const previewBottom = await page.locator('.dialog-preview').evaluate(el => el.getBoundingClientRect().bottom);
+  const controlsBottom = await page.getByRole('button', { name: 'Allontana', exact: true }).evaluate(el => el.getBoundingClientRect().bottom);
+  expect(controlsBottom).toBeLessThan(previewBottom);
   await page.getByRole('button', { name: 'Nero', exact: true }).click();
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-color', 'black');
   await page.getByRole('button', { name: '200%', exact: true }).click();
@@ -248,4 +251,80 @@ test('Sopranos original, poster and 3D print use exact published path spelling',
   await page.getByRole('button', { name: '200%', exact: true }).click();
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-print-scale', '200');
   await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/sopranos-path-fixed.png' });
+});
+
+test('catalog: existing categories, dependent folders, search counts and reset', async ({ page }) => {
+  await page.goto('./');
+  const total = await page.locator('[data-open]').count();
+  expect(total).toBeGreaterThanOrEqual(346);
+  const categories = await page.locator('#category-select option').allTextContents();
+  expect(categories.some(label => /^(others|altri film)(\s|$)/i.test(label))).toBeFalsy();
+  expect(categories.some(label => label.includes('Fahrenheit 451'))).toBeTruthy();
+  await page.locator('#category-select').selectOption('Italiani');
+  const italianCount = await page.locator('[data-open]').count();
+  await page.locator('#folder-level-0').selectOption('DARIO ARGENTO');
+  expect(await page.locator('[data-open]').count()).toBeLessThan(italianCount);
+  await expect(page.locator('#catalog-path')).toContainText('Italiani › Dario Argento');
+  await page.locator('.collection-toolbar').screenshot({ path: 'docs/screenshots/catalog-italiani.png' });
+  await page.locator('#folder-level-0').selectOption('ANTONIONI');
+  await page.locator('#folder-level-1').selectOption('BLOW UP');
+  await expect(page.locator('#catalog-path')).toContainText('Italiani › Antonioni › Blow Up');
+  expect(await page.locator('[data-open]').count()).toBeGreaterThan(0);
+  await page.locator('.collection-toolbar').screenshot({ path: 'docs/screenshots/catalog-nested.png' });
+  await page.locator('#category-select').selectOption('Tarantino');
+  await expect(page.locator('#catalog-path')).not.toContainText('Dario Argento');
+  await expect(page.locator('#folder-level-0')).toHaveValue('');
+  await page.locator('#folder-level-0').selectOption('PULP FICTION');
+  await expect(page.locator('#film-field')).toBeHidden();
+  await page.locator('#clear-filters').click();
+  await expect(page.locator('[data-open]')).toHaveCount(total);
+  await page.locator('#catalog-search').fill('FAHRENHEIT 451');
+  await expect(page.locator('#category-select option[value="Fahrenheit 451"]')).toContainText('(9)');
+  await expect(page.locator('[data-open]')).toHaveCount(9);
+  await page.locator('[data-open]').first().click();
+  await expect(page.locator('.dialog-info .section-index')).not.toContainText(/others/i);
+  await page.getByRole('button', { name: 'Chiudi anteprima', exact: true }).click();
+  await expect(page.locator('#product-dialog')).not.toBeVisible();
+});
+
+test('restored home, header search, favorites filter and mobile menu', async ({ page }) => {
+  await page.goto('./');
+  await page.screenshot({ path: 'docs/screenshots/restored-home.png' });
+  const hero = await page.locator('#hero-front img').evaluate(img => ({ image: img.getBoundingClientRect().width, card: img.parentElement.getBoundingClientRect().width }));
+  expect(hero.image).toBeLessThanOrEqual(hero.card + 1);
+  await page.locator('#search-toggle').click();
+  await expect(page.locator('#catalog-search')).toBeFocused();
+  await page.locator('[data-favorite]').first().click();
+  await page.locator('#favorites-toggle').click();
+  await expect(page.locator('[data-open]')).toHaveCount(1);
+  await page.locator('#clear-filters').click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('#menu-toggle').click();
+  await expect(page.locator('#menu-toggle')).toHaveAttribute('aria-expanded', 'true');
+  await page.locator('#mobile-nav a').first().click();
+  await expect(page.locator('#mobile-nav')).toBeHidden();
+  await page.locator('.collection-toolbar').screenshot({ path: 'docs/screenshots/catalog-mobile.png' });
+  const widths = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+  expect(widths[0]).toBeLessThanOrEqual(widths[1] + 1);
+});
+
+test('four 3D garment colors preserve artwork, scale and orbit without reloading', async ({ page }) => {
+  await openShirt(page);
+  const host = page.locator('.tshirt-viewer');
+  const artwork = await host.getAttribute('data-artwork');
+  await page.getByRole('button', { name: '150%', exact: true }).click();
+  await expect(host).toHaveAttribute('data-print-scale', '150');
+  const requests = []; page.on('request', r => { if (/boxy-shirt|assets\/originals/.test(r.url())) requests.push(r.url()); });
+  const screenshots = [];
+  for (const [name, key] of [['Bianco', 'white'], ['Nero', 'black'], ['Grigio', 'grey'], ['Panna vintage', 'vintage']]) {
+    await page.getByRole('button', { name, exact: true }).click();
+    await expect(host).toHaveAttribute('data-color', key);
+    await expect(host).toHaveAttribute('data-artwork', artwork);
+    await expect(host).toHaveAttribute('data-print-scale', '150');
+    await expect(page.getByRole('button', { name, exact: true })).toHaveAttribute('aria-pressed', 'true');
+    screenshots.push(await page.locator('.tshirt-stage canvas').screenshot());
+    if (['grey', 'vintage'].includes(key)) await page.locator('#product-dialog').screenshot({ path: `docs/screenshots/color-${key}.png` });
+  }
+  expect(new Set(screenshots.map(buffer => buffer.toString('base64'))).size).toBe(4);
+  expect(requests).toEqual([]);
 });
