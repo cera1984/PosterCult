@@ -209,7 +209,7 @@ function openDialog(id) {
 }
 
 buildFilters();
-updateSubgroups();
+updateSubgroupsAndFilms();
 setFeatured();
 render();
 
