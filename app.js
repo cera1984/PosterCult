@@ -1,6 +1,6 @@
 // Catalogo privato generato da generate_catalog.py: le immagini restano sull'SSD.
 const images = Array.isArray(window.POSTERZ_IMAGES) ? window.POSTERZ_IMAGES : [];
-const productTypes = { poster: 'Poster', originale: 'Immagine originale' };
+const productTypes = { poster: 'Poster', originale: 'Immagine originale', tshirt: 'T-shirt 3D' };
 const grid = document.getElementById('product-grid');
 const searchInput = document.getElementById('catalog-search');
 const filmFilter = document.getElementById('film-filter');
@@ -22,6 +22,34 @@ let onlyFavorites = false;
 let selectedImage = null;
 let selectedType = 'poster';
 let subgroup = 'tutte';
+let tshirtViewer = null;
+let viewerGeneration = 0;
+
+function disposeTshirtViewer() {
+  ++viewerGeneration;
+  tshirtViewer?.dispose();
+  tshirtViewer = null;
+}
+
+function tshirtMarkup() {
+  return `<div class="tshirt-viewer" data-state="loading"><div class="tshirt-stage" data-viewer-stage></div><p class="tshirt-status" data-viewer-status role="status" aria-live="polite">Caricamento del modello 3D…</p><fieldset class="tshirt-controls" data-viewer-controls disabled><legend>Controlli T-shirt 3D</legend><button type="button" data-view="white" aria-pressed="true">Bianco</button><button type="button" data-view="black" aria-pressed="false">Nero</button><button type="button" data-view="front">Fronte</button><button type="button" data-view="back">Retro</button><button type="button" data-view="in" aria-label="Avvicina">＋</button><button type="button" data-view="out" aria-label="Allontana">−</button></fieldset><p class="tshirt-credit">Trascina per ruotare a 360° · rotella o pizzico per zoomare<br>Base CC0 di Elvaerwyn / MakeHuman, adattata boxy. <a href="docs/tshirt-model.html" target="_blank" rel="noopener">Modello e limiti</a></p></div>`;
+}
+
+async function startTshirtViewer(item) {
+  const generation = viewerGeneration;
+  const host = dialogContent.querySelector('.tshirt-viewer');
+  try {
+    const { mountTshirtViewer } = await import('./tshirt-viewer.js');
+    if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
+    tshirtViewer = mountTshirtViewer(host, item);
+    dialogContent.querySelector('#tshirt-artwork').disabled = false;
+  } catch {
+    if (generation === viewerGeneration && host.isConnected) {
+      host.dataset.state = 'error';
+      host.querySelector('[data-viewer-status]').textContent = 'Vista 3D non disponibile. Apri il sito via HTTP/HTTPS; puoi continuare a usare Poster e Immagine originale.';
+    }
+  }
+}
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
@@ -37,6 +65,7 @@ function imageTag(item, full = false, lazy = true) {
   return `<img src="${escapeHtml(source)}" alt="" ${lazy ? 'loading="lazy"' : ''} decoding="async" />`;
 }
 function mockup(item, type, full = false, lazy = true) {
+  if (type === 'tshirt') return tshirtMarkup();
   const picture = imageTag(item, full, lazy);
   if (type === 'originale') return `<div class="mockup mockup-original"><div class="original-preview">${picture}</div></div>`;
   if (type === 'poster') return `<div class="mockup mockup-poster"><div class="poster-frame">${picture}</div></div>`;
@@ -132,9 +161,20 @@ function toggleFavorite(id) {
 }
 
 function renderDialog() {
+  disposeTshirtViewer();
   if (!selectedImage) return;
   const item = selectedImage;
   dialogContent.innerHTML = `<div class="dialog-layout"><div class="dialog-preview">${mockup(item, selectedType, true, false)}</div><div class="dialog-info"><span class="section-index">${escapeHtml(item.group)} / ${escapeHtml(item.folder)}</span><h2 id="dialog-title">${escapeHtml(item.film)}</h2><p class="dialog-description">${escapeHtml(item.filename)}<br />${item.width} × ${item.height} pixel · ${escapeHtml(item.filename.split('.').pop().toUpperCase())}</p><p class="dialog-label">VISUALIZZAZIONE DEL POSTER</p><div class="variant-list" role="group" aria-label="Seleziona anteprima">${Object.entries(productTypes).map(([type, label]) => `<button class="variant-button ${selectedType === type ? 'is-selected' : ''}" type="button" data-variant="${type}" aria-pressed="${selectedType === type}">${label}</button>`).join('')}</div><p class="dialog-price">Il file originale è nel tuo archivio.</p><a class="button button-dark original-link" href="${escapeHtml(fileUrl(item.original))}" target="_blank" rel="noopener">Apri il file originale <span aria-hidden="true">↗</span></a><p class="dialog-note">Le anteprime servono a immaginare il risultato: non modificano il file e non sono file pronti per la stampa. Verifica risoluzione e formato con chi stampa.</p></div></div>`;
+}
+
+function setupTshirtDialog(item) {
+  if (selectedType !== 'tshirt') return;
+  dialogContent.querySelector('.dialog-label').textContent = 'T-SHIRT BOXY · PROTOTIPO 3D';
+  const choices = document.createElement('div');
+  choices.className = 'tshirt-catalog';
+  choices.innerHTML = `<label for="tshirt-artwork">Grafica dal catalogo</label><select id="tshirt-artwork" disabled>${images.map(image => `<option value="${escapeHtml(image.id)}" ${image.id === item.id ? 'selected' : ''}>${escapeHtml(image.film)} — ${escapeHtml(image.filename)}</option>`).join('')}</select><p class="dialog-note">Taglio boxy indicativo, stampa frontale a proporzioni conservate. Nessuna simulazione di taglia, tessuto o file di stampa.</p>`;
+  dialogContent.querySelector('.variant-list').after(choices);
+  startTshirtViewer(item);
 }
 
 function openDialog(id) {
@@ -181,13 +221,21 @@ document.getElementById('search-toggle').addEventListener('click', () => {
 });
 document.getElementById('dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-dialog.addEventListener('close', () => { document.body.classList.remove('dialog-open'); selectedImage = null; });
+dialog.addEventListener('close', () => { disposeTshirtViewer(); document.body.classList.remove('dialog-open'); selectedImage = null; });
 dialogContent.addEventListener('click', event => {
   const button = event.target.closest('[data-variant]');
   if (!button) return;
   selectedType = button.dataset.variant;
   renderDialog();
+  setupTshirtDialog(selectedImage);
   dialogContent.querySelector(`[data-variant="${selectedType}"]`).focus();
+});
+dialogContent.addEventListener('change', event => {
+  if (event.target.id !== 'tshirt-artwork') return;
+  const item = images.find(image => image.id === event.target.value);
+  if (!item) return;
+  // Keep the original poster's title/link truthful; this selector changes only the print.
+  tshirtViewer?.setArtwork(item);
 });
 document.addEventListener('pointermove', event => {
   const stage = event.target.closest('[data-tilt]');

@@ -1,0 +1,44 @@
+{
+  "source": "assets/models/source/crude_male_shirt.obj",
+  "sourceSha256": "3389b981a826396213cce2e69f40b3d9eca6cdfadcfcbee2774acb1dfb322fa7",
+  "outputSha256": "365a275e451ed6fc4bdd6101ba5f38fa837b9c139a911413ae86f1836883f01e",
+  "bytes": 199640,
+  "triangles": 2068,
+  "expandedVertices": 6204,
+  "bounds": {
+    "min": [
+      -1.0120716094970703,
+      -0.7749999761581421,
+      -0.21297448873519897
+    ],
+    "max": [
+      1.0120716094970703,
+      0.7749999761581421,
+      0.21297448873519897
+    ]
+  },
+  "uv": {
+    "count": 6204,
+    "ranges": [
+      [
+        0.00009999999747378752,
+        0.5638999938964844
+      ],
+      [
+        0.00009999999747378752,
+        0.9998999834060669
+      ]
+    ],
+    "finite": true,
+    "degenerateTriangles": 0,
+    "overlap": "Not certified; printing uses separate front-only projected decal UVs."
+  },
+  "adaptation": {
+    "height": 1.55,
+    "widthMultiplier": 1.22,
+    "depthMultiplier": 0.58,
+    "bodyTargetHalfWidth": 0.64,
+    "outerSleeveDrop": 0.1,
+    "units": "preview units, not garment measurements"
+  }
+}
