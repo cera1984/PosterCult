@@ -1,4 +1,4 @@
-# T-shirt boxy: primo prototipo
+# T-shirt boxy: prototipo con dettagli del tessuto
 
 Aprire il sito via HTTP/HTTPS, selezionare un poster e scegliere **T-shirt 3D**.
 Trascinare per ruotare senza limiti sull'asse verticale; usare rotella/pizzico o i
@@ -23,7 +23,9 @@ esistente. Three.js e il modello si caricano solo scegliendo T-shirt 3D.
 Il modello di partenza è una T-shirt standard, **non un cartamodello oversized
 certificato**. Il derivato allarga corpo e maniche del 22% rispetto all'altezza e
 comprime la profondità al 58%, rettifica il profilo della vita e abbassa le
-estremità delle maniche, creando una silhouette boxy indicativa. Il file
+estremità delle maniche, creando una silhouette boxy indicativa. Il modello
+è stato ulteriormente rifinito con suddivisione della superficie, bordi
+ammorbiditi, scollo più stretto e pieghe statiche leggere. Il file
 GLB risultante è autosufficiente; non contiene avatar, texture del pacchetto,
 animazioni o riferimenti esterni. Anche questo adattamento geometrico viene
 distribuito sotto CC0 1.0. La licenza non si estende alle immagini del catalogo.
@@ -38,7 +40,8 @@ Alternative esaminate ma non incluse:
 `scripts/build-shirt.mjs` converte l'OBJ in glTF 2.0 binario (`.glb`), con
 posizioni, normali mediate e UV originali. Il [report](shirt-model-report.json)
 registra hash, dimensioni, conteggi e intervalli UV; la [mappa UV](shirt-uv.svg)
-permette l'ispezione. Sono presenti 6.204 vertici espansi, 2.068 triangoli,
+permette l'ispezione. Sono presenti 16.998 vertici indicizzati, 33.088 triangoli
+(99.264 vertici se espansi), un GLB da 743.732 byte,
 UV finite nell'intervallo 0–1 e zero triangoli UV degeneri. L'assenza di
 sovrapposizioni delle isole UV **non è certificata**.
 
@@ -53,9 +56,17 @@ orizzontale viene ridotta, senza tagliarla o stirarla. La texture è limitata a
 
 ## Limiti
 
+Colletto, bordi arrotolati e linee di doppia cucitura sono generati sui quattro
+bordi aperti del modello. Sono dettagli visivi, non un cartamodello sartoriale.
+Il materiale usa sheen, una trama procedurale condivisa tra tessuto e stampa,
+un ambiente studio generato localmente, luci laterali e ombre del capo su sé
+stesso. L'ombra morbida sotto il capo è un gradiente grafico. Nessuna nuova
+texture fotografica o modello di terzi è stato acquisito per questo affinamento.
+
 - Anteprima di forma e grafica: nessuna simulazione fisica di cotone, caduta,
   taglia, cuciture, spessore, vestibilità o resa di stampa reale.
-- Modello a bassa complessità, non una scansione o un mockup fotorealistico.
+- Modello rifinito a mano tramite codice, non una scansione o un mockup
+  fotorealistico; pieghe statiche, senza simulazione fisica.
 - Stampa solo frontale, centrata, dimensione automatica; nessun posizionamento
   libero, stampa sul retro, esportazione o file di produzione.
 - Nessuna rimozione automatica dello sfondo delle immagini.

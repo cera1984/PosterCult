@@ -39,7 +39,7 @@ async function startTshirtViewer(item) {
   const generation = viewerGeneration;
   const host = dialogContent.querySelector('.tshirt-viewer');
   try {
-    const { mountTshirtViewer } = await import('./tshirt-viewer.js');
+    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=realism-1');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
     tshirtViewer = mountTshirtViewer(host, item);
     dialogContent.querySelector('#tshirt-artwork').disabled = false;

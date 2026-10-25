@@ -2,18 +2,20 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { Vector3 } from 'three';
+import { refineGarment, boundaryLoops } from '../garment-geometry.js';
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const input = 'assets/models/source/crude_male_shirt.obj';
 const obj = await readFile(input);
 const root = new OBJLoader().parse(obj.toString());
 const meshes = []; root.traverse(o => { if (o.isMesh) meshes.push(o); });
 if (meshes.length !== 1) throw new Error('Expected exactly one garment mesh');
-const geometry = meshes[0].geometry;
+let geometry = meshes[0].geometry;
 geometry.computeBoundingBox();
 const center = geometry.boundingBox.getCenter(new Vector3());
 const height = geometry.boundingBox.max.y - geometry.boundingBox.min.y;
 const scale = 1.55 / height;
-const position = geometry.attributes.position, uv = geometry.attributes.uv;
+let position = geometry.attributes.position, uv = geometry.attributes.uv;
 if (!uv || uv.count !== position.count) throw new Error('Missing complete UV coordinates');
 const sideProfile = [[-.775, .58], [-.7, .558], [-.6, .529], [-.5, .518], [-.4, .511], [-.3, .510], [-.2, .520], [-.1, .534], [0, .552], [.1, .586], [.12, .60], [.3, .64]];
 function boxyFactor(y) {
@@ -29,8 +31,13 @@ for (let i = 0; i < position.count; i++) {
   const y = (position.getY(i) - center.y) * scale;
   const x = (position.getX(i) - center.x) * scale * 1.22 * boxyFactor(y);
   const sleeveDrop = .10 * Math.max(0, Math.min(1, (Math.abs(x) - .64) / .26));
-  position.setXYZ(i, x, y - sleeveDrop, (position.getZ(i) - center.z) * scale * .58);
+  const z = (position.getZ(i) - center.z) * scale * .58;
+  const neck = Math.exp(-Math.pow((y - .64) / .22, 4)) * Math.exp(-Math.pow(Math.abs(x) / .49, 6));
+  const frontNeckLift = z > .05 ? .045 * Math.exp(-Math.pow(x / .34, 4)) * Math.exp(-Math.pow((y - .5) / .12, 2)) : 0;
+  position.setXYZ(i, x * (1 - .18 * neck), y - sleeveDrop + frontNeckLift, z);
 }
+geometry = refineGarment(geometry);
+position = geometry.attributes.position; uv = geometry.attributes.uv;
 geometry.computeVertexNormals();
 // OBJ is expanded at UV seams; average normals by position so seams do not look faceted.
 const sums = new Map(), normal = geometry.attributes.normal;
@@ -42,18 +49,24 @@ for (let i = 0; i < position.count; i++) {
 for (let i = 0; i < position.count; i++) { const n = sums.get(key(i)).clone().normalize(); normal.setXYZ(i, n.x, n.y, n.z); }
 geometry.computeBoundingBox();
 const min = geometry.boundingBox.min.toArray(), max = geometry.boundingBox.max.toArray();
+const indexed = mergeVertices(geometry, 1e-6);
 let byteOffset = 0;
 const buffers = [], views = [], accessors = [];
-for (const [name, attribute, type] of [['POSITION', position, 'VEC3'], ['NORMAL', normal, 'VEC3'], ['TEXCOORD_0', uv, 'VEC2']]) {
+for (const [name, attribute, type] of [['POSITION', indexed.attributes.position, 'VEC3'], ['NORMAL', indexed.attributes.normal, 'VEC3'], ['TEXCOORD_0', indexed.attributes.uv, 'VEC2']]) {
   const buffer = Buffer.from(attribute.array.buffer, attribute.array.byteOffset, attribute.array.byteLength);
   buffers.push(buffer); views.push({ buffer: 0, byteOffset, byteLength: buffer.length, target: 34962 });
   accessors.push({ bufferView: views.length - 1, componentType: 5126, count: attribute.count, type, ...(name === 'POSITION' ? { min, max } : {}) });
   byteOffset += buffer.length;
 }
+const indexBuffer = Buffer.from(indexed.index.array.buffer, indexed.index.array.byteOffset, indexed.index.array.byteLength);
+views.push({ buffer: 0, byteOffset, byteLength: indexBuffer.length, target: 34963 });
+accessors.push({ bufferView: 3, componentType: indexed.index.array instanceof Uint16Array ? 5123 : 5125, count: indexed.index.count, type: 'SCALAR' });
+const paddedIndices = Buffer.concat([indexBuffer, Buffer.alloc((4 - indexBuffer.length % 4) % 4)]);
+buffers.push(paddedIndices); byteOffset += paddedIndices.length;
 const gltf = {
   asset: { version: '2.0', generator: 'PosterCult scripts/build-shirt.mjs', copyright: 'Makehuman edited by Elvaerwyn (CC0); PosterCult boxy adaptation' },
   scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0, name: 'Boxy T-shirt (prototype)' }],
-  meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, TEXCOORD_0: 2 }, material: 0 }] }],
+  meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, TEXCOORD_0: 2 }, indices: 3, material: 0 }] }],
   materials: [{ name: 'Cotton preview', doubleSided: true, pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: .96 } }],
   buffers: [{ byteLength: byteOffset }], bufferViews: views, accessors,
 };
@@ -77,6 +90,6 @@ for (let i = 0; i < uv.count; i += 3) {
   paths.push(`<path d="M${points.map(([u, v]) => `${(u * 640).toFixed(2)},${((1 - v) * 640).toFixed(2)}`).join('L')}Z"/>`);
 }
 await writeFile('docs/shirt-uv.svg', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 656 656"><rect x="-8" y="-8" width="656" height="656" fill="#faf8f2"/><g fill="none" stroke="#244a38" stroke-width=".35">${paths.join('')}</g></svg>`);
-const report = { source: input, sourceSha256: createHash('sha256').update(obj).digest('hex'), outputSha256: createHash('sha256').update(glb).digest('hex'), bytes: glb.length, triangles: position.count / 3, expandedVertices: position.count, bounds: { min, max }, uv: { count: uv.count, ranges, finite: [...uv.array].every(Number.isFinite), degenerateTriangles: degenerateUVTriangles, overlap: 'Not certified; printing uses separate front-only projected decal UVs.' }, adaptation: { height: 1.55, widthMultiplier: 1.22, depthMultiplier: .58, bodyTargetHalfWidth: .64, outerSleeveDrop: .10, units: 'preview units, not garment measurements' } };
+const report = { source: input, sourceSha256: createHash('sha256').update(obj).digest('hex'), outputSha256: createHash('sha256').update(glb).digest('hex'), bytes: glb.length, triangles: position.count / 3, vertices: indexed.attributes.position.count, expandedVertices: position.count, boundaries: boundaryLoops(geometry).length, bounds: { min, max }, uv: { count: indexed.attributes.uv.count, ranges, finite: [...uv.array].every(Number.isFinite), degenerateTriangles: degenerateUVTriangles, overlap: 'Not certified; printing uses separate front-only projected decal UVs.' }, adaptation: { height: 1.55, widthMultiplier: 1.22, depthMultiplier: .58, bodyTargetHalfWidth: .64, outerSleeveDrop: .10, neckline: 'narrower with raised front', detail: 'two midpoint subdivisions, boundary smoothing, static analytic folds', units: 'preview units, not garment measurements' } };
 await writeFile('docs/shirt-model-report.json', JSON.stringify(report, null, 2) + '\n');
 console.log(report);

@@ -1,6 +1,6 @@
 # Verifica del prototipo — 25 ottobre 2026
 
-Base del lavoro: `8227df4` (main, Focus website copy on posters only).
+Base dell'affinamento visivo: `ba1119c` (main, primo configuratore pubblicato).
 
 ## Eseguito e superato
 
@@ -9,12 +9,13 @@ Base del lavoro: `8227df4` (main, Focus website copy on posters only).
   validazione Khronos e disponibilità di originali/miniature di tutte le **270 immagini**.
 - Khronos glTF Validator: **0 errori, 0 warning**, una nota informativa sulle
   UV non usate da texture interne al GLB (il viewer usa una decal indipendente).
-- `npm run test:browser`: **8/8**, Chromium 141.0.7390.37, Playwright 1.56.1,
-  Windows, rendering WebGL con SwiftShader; ultima esecuzione completa 11,4 s.
+- `npm run test:browser`: **9/9**, Chromium 141.0.7390.37, Playwright 1.56.1,
+  Windows, rendering WebGL con SwiftShader.
 - Test sotto `/PosterCult/`, per controllare import, asset e URL del catalogo
   in una sottocartella come GitHub Pages.
 - Ispezione visiva delle schermate di fronte bianco, fronte nero, retro,
-  grafica orizzontale e viewport 390 × 844.
+  grafica orizzontale e viewport 390 × 844, più la grafica 2001 inclinata e
+  dettagli ravvicinati in bianco e nero.
 - Installazione delle dipendenze: audit npm iniziale **0 vulnerabilità**.
 
 ## Copertura browser
@@ -32,6 +33,14 @@ Base del lavoro: `8227df4` (main, Focus website copy on posters only).
 7. WebGL non disponibile: messaggio esplicito, poster utilizzabile.
 8. Download grafico lento seguito da una nuova selezione: resta l'ultima grafica,
    senza sostituzioni dovute alla risposta precedente arrivata in ritardo.
+9. Grafica 2001 a 17° e zoom ravvicinato: rendering della trama e dei dettagli,
+   nessun errore WebGL/GLSL segnalato nella console. Anche il test desktop
+   controlla gli errori di compilazione dei materiali.
+
+Il test del GLB ora verifica anche i quattro bordi aperti dopo caricamento
+del modello indicizzato (collo, fondo e due maniche), e il limite di peso.
+Modello finale: 33.088 triangoli, 16.998 vertici indicizzati, 743.732 byte;
+normali ricalcolate dopo la deformazione e UV originali interpolate.
 
 Le schermate sono in [screenshots](screenshots/). I test non certificano
 fedeltà fisica, qualità di stampa, diritti delle immagini, prestazioni su
