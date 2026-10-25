@@ -4,20 +4,23 @@ import { GLTFLoader } from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
 import { DecalGeometry } from './vendor/three/examples/jsm/geometries/DecalGeometry.js';
 import { RoomEnvironment } from './vendor/three/examples/jsm/environments/RoomEnvironment.js';
 import { cottonMaterial, garmentTrims, setCottonColor } from './garment-material.js';
+import { normalizePrintScale, printDimensions } from './print-layout.js';
 
-const modelUrl = new URL('./assets/models/boxy-shirt.glb?v=realism-1', import.meta.url).href;
+const modelUrl = new URL('./assets/models/boxy-shirt.glb?v=fit-scale-1', import.meta.url).href;
 
 // One viewer per open dialog. Every asynchronous completion checks disposal/version.
-export function mountTshirtViewer(host, initialItem) {
+export function mountTshirtViewer(host, initialItem, { scalePanel } = {}) {
   const status = host.querySelector('[data-viewer-status]');
   const stage = host.querySelector('[data-viewer-stage]');
   const controlsPanel = host.querySelector('[data-viewer-controls]');
   let disposed = false, request = 0, shirt, decal, texture, frontSurface;
   let renderer, controls, observer, trims, environmentTarget, groundTexture;
   let pendingItem = initialItem;
+  let printScale = 100, artworkRatio = 1, scaleFrame;
+  let framingDistance = 4.45;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 50);
-  camera.position.set(0, 0.05, 3.8);
+  camera.position.set(0, 0.05, 4.45);
   const setStatus = (message, state) => {
     if (disposed) return;
     status.textContent = message;
@@ -70,6 +73,42 @@ export function mountTshirtViewer(host, initialItem) {
   };
   const onContextLost = event => { event.preventDefault(); setStatus('La vista 3D è stata interrotta. Torna a Poster e riapri T-shirt 3D.', 'error'); };
 
+  function rebuildPrint(nextTexture = texture, ratio = artworkRatio) {
+    if (!frontSurface || !nextTexture || disposed) return;
+    const { width, height } = printDimensions(ratio, printScale);
+    const geometry = new DecalGeometry(frontSurface, new THREE.Vector3(0, -.02, .25), new THREE.Euler(), new THREE.Vector3(width, height, 1));
+    if (!geometry.attributes.position.count) { geometry.dispose(); throw new Error('Empty print geometry'); }
+    if (!decal) {
+      const ink = cottonMaterial('ink');
+      ink.map = nextTexture; ink.transparent = true; ink.roughness = .91;
+      ink.depthWrite = false; ink.polygonOffset = true; ink.polygonOffsetFactor = -4;
+      decal = new THREE.Mesh(geometry, ink); decal.receiveShadow = true;
+      decal.renderOrder = 1; scene.add(decal);
+    } else {
+      decal.geometry.dispose(); decal.geometry = geometry; decal.material.map = nextTexture;
+    }
+    if (texture && texture !== nextTexture) texture.dispose();
+    texture = nextTexture; artworkRatio = ratio;
+    host.dataset.printScale = String(printScale);
+    host.dataset.printWidth = String(width); host.dataset.printHeight = String(height);
+    render();
+  }
+
+  function setPrintScale(value) {
+    printScale = normalizePrintScale(value);
+    if (scalePanel) {
+      scalePanel.querySelector('input').value = String(printScale);
+      scalePanel.querySelector('output').value = `${printScale}%`;
+      scalePanel.querySelectorAll('[data-print-scale]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.printScale) === printScale)));
+    }
+    cancelAnimationFrame(scaleFrame);
+    scaleFrame = requestAnimationFrame(() => rebuildPrint());
+  }
+  const onScaleInput = event => { if (event.target.matches('[data-print-range]')) setPrintScale(event.target.value); };
+  const onScaleClick = event => { const button = event.target.closest('[data-print-scale]'); if (button) setPrintScale(button.dataset.printScale); };
+  scalePanel?.addEventListener('input', onScaleInput);
+  scalePanel?.addEventListener('click', onScaleClick);
+
   async function setArtwork(item) {
     pendingItem = item;
     const version = ++request;
@@ -93,15 +132,8 @@ export function mountTshirtViewer(host, initialItem) {
       loaded.colorSpace = THREE.SRGBColorSpace;
       loaded.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
       loaded.needsUpdate = true;
-      const height = Math.min(.76, .56 / ratio), width = height * ratio;
-      const geometry = new DecalGeometry(frontSurface, new THREE.Vector3(0, -.02, .25), new THREE.Euler(), new THREE.Vector3(width, height, 1));
-      if (!geometry.attributes.position.count) { loaded.dispose(); geometry.dispose(); throw new Error('Empty print geometry'); }
-      releasePrint(); texture = loaded;
-      const ink = cottonMaterial('ink');
-      ink.map = texture; ink.transparent = true; ink.roughness = .91;
-      ink.depthWrite = false; ink.polygonOffset = true; ink.polygonOffsetFactor = -4;
-      decal = new THREE.Mesh(geometry, ink); decal.receiveShadow = true;
-      decal.renderOrder = 1; scene.add(decal);
+      try { rebuildPrint(loaded, ratio); } catch (error) { loaded.dispose(); throw error; }
+      if (scalePanel) scalePanel.disabled = false;
       host.dataset.artwork = item.id;
       setStatus('Anteprima 3D pronta · stampa sul davanti', 'ready'); render();
     } catch (error) {
@@ -114,6 +146,8 @@ export function mountTshirtViewer(host, initialItem) {
   const dispose = () => {
     if (disposed) return;
     disposed = true; ++request;
+    cancelAnimationFrame(scaleFrame);
+    scalePanel?.removeEventListener('input', onScaleInput); scalePanel?.removeEventListener('click', onScaleClick);
     observer?.disconnect(); controls?.dispose();
     host.removeEventListener('click', onAction);
     if (renderer) {
@@ -146,7 +180,7 @@ export function mountTshirtViewer(host, initialItem) {
       stage.append(renderer.domElement);
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enablePan = false; controls.enableDamping = false;
-      controls.minDistance = 2.2; controls.maxDistance = 6;
+      controls.minDistance = 2.2; controls.maxDistance = 8;
       controls.minPolarAngle = .25; controls.maxPolarAngle = Math.PI - .25;
       controls.target.set(0, .05, 0); controls.update(); controls.addEventListener('change', render);
       scene.add(new THREE.HemisphereLight(0xfff8ee, 0x555c61, .85));
@@ -169,7 +203,14 @@ export function mountTshirtViewer(host, initialItem) {
         if (disposed) return;
         const { width, height } = stage.getBoundingClientRect();
         if (!width || !height) return;
-        renderer.setSize(width, height, false); camera.aspect = width / height; camera.updateProjectionMatrix(); render();
+        renderer.setSize(width, height, false); camera.aspect = width / height;
+        // Keep the initial garment within 70% of the viewport width, even in tall dialogs.
+        // Preserve the user's relative zoom when the viewport changes.
+        const nextFraming = Math.max(4.45, 1.78 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect * .70));
+        const offset = camera.position.clone().sub(controls.target);
+        offset.setLength(THREE.MathUtils.clamp(offset.length() * nextFraming / framingDistance, controls.minDistance, controls.maxDistance));
+        camera.position.copy(controls.target).add(offset); framingDistance = nextFraming;
+        camera.updateProjectionMatrix(); controls.update(); render();
       });
       observer.observe(stage);
       const gltf = await new GLTFLoader().loadAsync(modelUrl);

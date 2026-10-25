@@ -38,6 +38,12 @@ for (let i = 0; i < position.count; i++) {
 }
 geometry = refineGarment(geometry);
 position = geometry.attributes.position; uv = geometry.attributes.uv;
+// Relaxed proportions: narrower shoulders/body, a little more length and a soft waist.
+for (let i = 0; i < position.count; i++) {
+  const x = position.getX(i), y = position.getY(i), z = position.getZ(i);
+  const waist = 1 - .035 * Math.exp(-Math.pow((y + .2) / .4, 2));
+  position.setXYZ(i, x * .88 * waist, y * 1.06, z);
+}
 geometry.computeVertexNormals();
 // OBJ is expanded at UV seams; average normals by position so seams do not look faceted.
 const sums = new Map(), normal = geometry.attributes.normal;
@@ -91,5 +97,6 @@ for (let i = 0; i < uv.count; i += 3) {
 }
 await writeFile('docs/shirt-uv.svg', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 656 656"><rect x="-8" y="-8" width="656" height="656" fill="#faf8f2"/><g fill="none" stroke="#244a38" stroke-width=".35">${paths.join('')}</g></svg>`);
 const report = { source: input, sourceSha256: createHash('sha256').update(obj).digest('hex'), outputSha256: createHash('sha256').update(glb).digest('hex'), bytes: glb.length, triangles: position.count / 3, vertices: indexed.attributes.position.count, expandedVertices: position.count, boundaries: boundaryLoops(geometry).length, bounds: { min, max }, uv: { count: indexed.attributes.uv.count, ranges, finite: [...uv.array].every(Number.isFinite), degenerateTriangles: degenerateUVTriangles, overlap: 'Not certified; printing uses separate front-only projected decal UVs.' }, adaptation: { height: 1.55, widthMultiplier: 1.22, depthMultiplier: .58, bodyTargetHalfWidth: .64, outerSleeveDrop: .10, neckline: 'narrower with raised front', detail: 'two midpoint subdivisions, boundary smoothing, static analytic folds', units: 'preview units, not garment measurements' } };
+report.adaptation.finalProportions = { widthMultiplier: .88, heightMultiplier: 1.06, waistReduction: .035 };
 await writeFile('docs/shirt-model-report.json', JSON.stringify(report, null, 2) + '\n');
 console.log(report);

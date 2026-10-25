@@ -6,6 +6,18 @@ pulsanti per lo zoom. Sono disponibili bianco, nero, fronte e retro. Il menu
 **Grafica dal catalogo** cambia la stampa senza ricreare il visualizzatore.
 La selezione della grafica non cambia il titolo e il link del poster aperto.
 
+**Dimensione grafica** regola entrambe le dimensioni dal 25% al 300%, con
+pulsanti rapidi 100%, 150% e 200%. La percentuale resta selezionata cambiando
+immagine nella stessa vista; riaprendo il visualizzatore riparte dal 100%.
+Le proporzioni dell'immagine restano invariate e la parte oltre i bordi del
+capo viene ritagliata dalla geometria. Non viene scaricata nuovamente la
+grafica quando cambia soltanto la dimensione.
+
+La silhouette attuale restringe del 12% la versione precedente, allunga il
+capo del 6% e introduce una lieve rientranza in vita. La distanza iniziale
+della camera passa da 3,8 ad almeno 4,45 unità, con adattamento alla larghezza
+del riquadro per occupare al massimo circa il 70% della vista all'apertura.
+
 Il catalogo, i filtri, i preferiti e la vista poster/originale usano il codice
 esistente. Three.js e il modello si caricano solo scegliendo T-shirt 3D.
 
@@ -67,7 +79,7 @@ texture fotografica o modello di terzi è stato acquisito per questo affinamento
   taglia, cuciture, spessore, vestibilità o resa di stampa reale.
 - Modello rifinito a mano tramite codice, non una scansione o un mockup
   fotorealistico; pieghe statiche, senza simulazione fisica.
-- Stampa solo frontale, centrata, dimensione automatica; nessun posizionamento
+- Stampa solo frontale, centrata, dimensione regolabile; nessun posizionamento
   libero, stampa sul retro, esportazione o file di produzione.
 - Nessuna rimozione automatica dello sfondo delle immagini.
 - WebGL 2 e browser moderno con moduli/import map richiesti per il 3D.

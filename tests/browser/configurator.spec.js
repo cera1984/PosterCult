@@ -83,6 +83,8 @@ test('mobile viewport: visible controls, canvas, no horizontal overflow', async 
   await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/mobile.png' });
   await page.getByRole('button', { name: 'Nero', exact: true }).click();
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-color', 'black');
+  await page.getByRole('button', { name: '200%', exact: true }).click();
+  await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-print-scale', '200');
   const sizes = await page.locator('#product-dialog').evaluate(el => ({ scroll: el.scrollWidth, client: el.clientWidth }));
   expect(sizes.scroll).toBeLessThanOrEqual(sizes.client + 1);
 });
@@ -178,4 +180,57 @@ test('realism: 2001 artwork at an angle and closer fabric inspection', async ({ 
   await page.getByRole('button', { name: 'Nero', exact: true }).click();
   await page.locator('.tshirt-stage').screenshot({ path: 'docs/screenshots/realism-closeup-black.png' });
   expect(errors).toEqual([]);
+});
+
+test('print size: presets, arbitrary percentage, boundaries and catalog persistence', async ({ page }) => {
+  const errors = [], requests = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await openShirt(page);
+  const host = page.locator('.tshirt-viewer'), slider = page.locator('[data-print-range]');
+  expect(Number(await page.locator('[data-viewer-stage]').getAttribute('data-distance'))).toBeGreaterThanOrEqual(4.45);
+  await expect(host).toHaveAttribute('data-print-scale', '100');
+  const baseWidth = Number(await host.getAttribute('data-print-width'));
+  const initial = await page.locator('canvas').last().screenshot();
+  page.on('request', r => { if (r.url().includes('/assets/originals/')) requests.push(r.url()); });
+  for (const percent of [150, 200]) {
+    await page.getByRole('button', { name: `${percent}%`, exact: true }).click();
+    await expect(host).toHaveAttribute('data-print-scale', String(percent));
+    expect(Number(await host.getAttribute('data-print-width')) / baseWidth).toBeCloseTo(percent / 100, 8);
+    await expect(slider).toHaveValue(String(percent));
+    await expect(page.getByRole('button', { name: `${percent}%`, exact: true })).toHaveAttribute('aria-pressed', 'true');
+  }
+  expect(Buffer.compare(initial, await page.locator('canvas').last().screenshot())).not.toBe(0);
+  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/print-200.png' });
+  for (const percent of [275, 25, 300]) {
+    await slider.fill(String(percent));
+    await expect(host).toHaveAttribute('data-print-scale', String(percent));
+    await expect(page.locator('[data-print-controls] output')).toHaveText(`${percent}%`);
+  }
+  expect(requests).toEqual([]);
+  await page.getByRole('button', { name: '150%', exact: true }).click();
+  const next = await page.locator('#tshirt-artwork option').nth(3).getAttribute('value');
+  await page.locator('#tshirt-artwork').selectOption(next);
+  await expect(host).toHaveAttribute('data-artwork', next);
+  await expect(host).toHaveAttribute('data-print-scale', '150');
+  await expect(host).toHaveAttribute('data-state', 'ready');
+  await page.getByRole('button', { name: 'Poster', exact: true }).click();
+  await page.getByRole('button', { name: 'T-shirt 3D', exact: true }).click();
+  await expect(host).toHaveAttribute('data-state', 'ready');
+  await expect(host).toHaveAttribute('data-print-scale', '100');
+  expect(errors).toEqual([]);
+});
+
+test('changing print scale during an image download uses the latest scale', async ({ page }) => {
+  await openShirt(page);
+  let release, arrived;
+  const gate = new Promise(resolve => { release = resolve; });
+  const started = new Promise(resolve => { arrived = resolve; });
+  await page.route('**/tl2.jpg', async route => { arrived(); await gate; await route.continue(); });
+  const next = await page.locator('#tshirt-artwork option').nth(1).getAttribute('value');
+  await page.locator('#tshirt-artwork').selectOption(next); await started;
+  await page.getByRole('button', { name: '200%', exact: true }).click();
+  release();
+  await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-artwork', next);
+  await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-state', 'ready');
+  await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-print-scale', '200');
 });

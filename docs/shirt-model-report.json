@@ -1,7 +1,7 @@
 {
   "source": "assets/models/source/crude_male_shirt.obj",
   "sourceSha256": "3389b981a826396213cce2e69f40b3d9eca6cdfadcfcbee2774acb1dfb322fa7",
-  "outputSha256": "b61d8a91802e89ec4ce8befc6bcead8a27910061d70bd94e79f5280dbf0913a8",
+  "outputSha256": "20a6b30d3a19f887299c67e2bcb1579babbc96dad356f04f0f494c374812d9ef",
   "bytes": 743732,
   "triangles": 33088,
   "vertices": 16998,
@@ -9,13 +9,13 @@
   "boundaries": 4,
   "bounds": {
     "min": [
-      -1.0109493732452393,
-      -0.7784172296524048,
+      -0.8834946751594543,
+      -0.8251222372055054,
       -0.21859419345855713
     ],
     "max": [
-      1.01092529296875,
-      0.7715104222297668,
+      0.8835362195968628,
+      0.8178010582923889,
       0.22481772303581238
     ]
   },
@@ -43,6 +43,11 @@
     "outerSleeveDrop": 0.1,
     "neckline": "narrower with raised front",
     "detail": "two midpoint subdivisions, boundary smoothing, static analytic folds",
-    "units": "preview units, not garment measurements"
+    "units": "preview units, not garment measurements",
+    "finalProportions": {
+      "widthMultiplier": 0.88,
+      "heightMultiplier": 1.06,
+      "waistReduction": 0.035
+    }
   }
 }
