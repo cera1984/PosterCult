@@ -1,0 +1,15 @@
+.tshirt-viewer{width:100%;height:100%;display:flex;flex-direction:column;padding:22px 12px 12px;min-height:530px;background:radial-gradient(ellipse at 50% 35%,#f7f4ec,#d8d9cf);position:relative}
+.tshirt-stage{flex:1;min-height:350px;width:100%;position:relative;touch-action:none}
+.tshirt-stage canvas{display:block;width:100%;height:100%;position:absolute;inset:0;cursor:grab;outline-offset:-3px}
+.tshirt-stage canvas:active{cursor:grabbing}.tshirt-stage canvas:focus-visible{outline:2px solid #a05b43}
+.tshirt-status{text-align:center;font-size:12px;line-height:1.5;margin:8px 10px;min-height:36px;color:#35453b}
+.tshirt-viewer[data-state=error] .tshirt-status{color:#853b26}
+.tshirt-controls{border:0;margin:0;padding:4px 8px;display:flex;flex-wrap:wrap;justify-content:center;gap:7px}
+.tshirt-controls button{min-width:42px;min-height:42px;padding:8px 11px;background:#f9f6ee;border:1px solid #b6b9aa;border-radius:4px;color:#26382b;font:12px inherit;cursor:pointer}
+.tshirt-controls button[aria-pressed=true]{outline:2px solid #a05b43;outline-offset:1px}
+.tshirt-controls button:disabled{cursor:wait;opacity:.45}.tshirt-controls legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.tshirt-credit{text-align:center;font-size:10px;line-height:1.5;margin:8px 0 0}.tshirt-credit a{color:#72533e;text-decoration:underline}
+.tshirt-catalog{margin-top:18px}.tshirt-catalog label{display:block;font-size:12px;margin-bottom:6px}.tshirt-catalog select{max-width:100%;width:100%;background:#f8f5eb;border:1px solid #b6b9aa;padding:12px;font-size:13px}
+.dialog-preview:has(.tshirt-viewer){height:auto;min-height:580px;align-items:stretch}
+@media(max-width:760px){.dialog-layout:has(.tshirt-viewer){grid-template-columns:1fr}.dialog-preview:has(.tshirt-viewer){height:530px;min-height:530px}.tshirt-viewer{min-height:530px}.tshirt-stage{min-height:340px}}
+@media(max-width:480px){.dialog-preview:has(.tshirt-viewer){height:490px;min-height:490px}.tshirt-viewer{min-height:490px}.tshirt-stage{min-height:290px}}
