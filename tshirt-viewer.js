@@ -2,8 +2,10 @@ import * as THREE from 'three';
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
 import { DecalGeometry } from './vendor/three/examples/jsm/geometries/DecalGeometry.js';
+import { RoomEnvironment } from './vendor/three/examples/jsm/environments/RoomEnvironment.js';
+import { cottonMaterial, garmentTrims, setCottonColor } from './garment-material.js';
 
-const modelUrl = new URL('./assets/models/boxy-shirt.glb', import.meta.url).href;
+const modelUrl = new URL('./assets/models/boxy-shirt.glb?v=realism-1', import.meta.url).href;
 
 // One viewer per open dialog. Every asynchronous completion checks disposal/version.
 export function mountTshirtViewer(host, initialItem) {
@@ -11,7 +13,7 @@ export function mountTshirtViewer(host, initialItem) {
   const stage = host.querySelector('[data-viewer-stage]');
   const controlsPanel = host.querySelector('[data-viewer-controls]');
   let disposed = false, request = 0, shirt, decal, texture, frontSurface;
-  let renderer, controls, observer;
+  let renderer, controls, observer, trims, environmentTarget, groundTexture;
   let pendingItem = initialItem;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 50);
@@ -60,7 +62,7 @@ export function mountTshirtViewer(host, initialItem) {
     if (button.dataset.view === 'out') zoom(1.15);
     if (button.dataset.view === 'white' || button.dataset.view === 'black') {
       const color = button.dataset.view;
-      shirt.material.color.set(color === 'white' ? '#f4f1e9' : '#18191b');
+      setCottonColor([shirt, trims], color);
       host.dataset.color = color;
       host.querySelectorAll('[data-view="white"], [data-view="black"]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
       render();
@@ -95,7 +97,10 @@ export function mountTshirtViewer(host, initialItem) {
       const geometry = new DecalGeometry(frontSurface, new THREE.Vector3(0, -.02, .25), new THREE.Euler(), new THREE.Vector3(width, height, 1));
       if (!geometry.attributes.position.count) { loaded.dispose(); geometry.dispose(); throw new Error('Empty print geometry'); }
       releasePrint(); texture = loaded;
-      decal = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ map: texture, transparent: true, roughness: .94, metalness: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 }));
+      const ink = cottonMaterial('ink');
+      ink.map = texture; ink.transparent = true; ink.roughness = .91;
+      ink.depthWrite = false; ink.polygonOffset = true; ink.polygonOffsetFactor = -4;
+      decal = new THREE.Mesh(geometry, ink); decal.receiveShadow = true;
       decal.renderOrder = 1; scene.add(decal);
       host.dataset.artwork = item.id;
       setStatus('Anteprima 3D pronta · stampa sul davanti', 'ready'); render();
@@ -116,7 +121,9 @@ export function mountTshirtViewer(host, initialItem) {
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
     }
     releasePrint(); frontSurface?.geometry.dispose(); frontSurface?.material.dispose();
-    scene.traverse(object => { if (object.isMesh) { object.geometry.dispose(); object.material.dispose(); } });
+    scene.traverse(object => { object.geometry?.dispose(); object.material?.dispose(); });
+    environmentTarget?.dispose();
+    groundTexture?.dispose();
     scene.clear(); renderer?.dispose(); renderer?.forceContextLoss(); renderer?.domElement.remove();
   };
 
@@ -125,7 +132,12 @@ export function mountTshirtViewer(host, initialItem) {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
+      renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      const room = new RoomEnvironment(), pmrem = new THREE.PMREMGenerator(renderer);
+      environmentTarget = pmrem.fromScene(room, .04);
+      scene.environment = environmentTarget.texture; scene.environmentIntensity = .4;
+      room.dispose(); pmrem.dispose();
       renderer.domElement.tabIndex = 0;
       renderer.domElement.setAttribute('role', 'img');
       renderer.domElement.setAttribute('aria-label', 'T-shirt 3D. Frecce per ruotare; più e meno per zoomare.');
@@ -137,10 +149,22 @@ export function mountTshirtViewer(host, initialItem) {
       controls.minDistance = 2.2; controls.maxDistance = 6;
       controls.minPolarAngle = .25; controls.maxPolarAngle = Math.PI - .25;
       controls.target.set(0, .05, 0); controls.update(); controls.addEventListener('change', render);
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x68736b, 2.5));
-      for (const [position, intensity] of [[[3, 4, 5], 3], [[-3, 1, -4], 2.5]]) {
+      scene.add(new THREE.HemisphereLight(0xfff8ee, 0x555c61, .85));
+      for (const [position, intensity] of [[[-2.5, 3, 3], 3.2], [[3, .5, 2], .6], [[2, 2, -3], 2]]) {
         const light = new THREE.DirectionalLight(0xffffff, intensity); light.position.set(...position); scene.add(light);
+        if (intensity === 3.2) {
+          light.castShadow = true; light.shadow.mapSize.set(2048, 2048);
+          Object.assign(light.shadow.camera, { left: -1.4, right: 1.4, top: 1.3, bottom: -1.3, near: .1, far: 10 });
+          light.shadow.normalBias = .008; light.shadow.bias = -.0001;
+        }
       }
+      const shadowCanvas = document.createElement('canvas'); shadowCanvas.width = shadowCanvas.height = 128;
+      const shadowContext = shadowCanvas.getContext('2d'), gradient = shadowContext.createRadialGradient(64, 64, 4, 64, 64, 64);
+      gradient.addColorStop(0, 'rgba(30,32,30,.24)'); gradient.addColorStop(.45, 'rgba(30,32,30,.12)'); gradient.addColorStop(1, 'rgba(30,32,30,0)');
+      shadowContext.fillStyle = gradient; shadowContext.fillRect(0, 0, 128, 128);
+      groundTexture = new THREE.CanvasTexture(shadowCanvas);
+      const ground = new THREE.Mesh(new THREE.PlaneGeometry(2.9, 1.25), new THREE.MeshBasicMaterial({ map: groundTexture, transparent: true, depthWrite: false }));
+      ground.rotation.x = -Math.PI / 2; ground.position.y = -.88; scene.add(ground);
       observer = new ResizeObserver(() => {
         if (disposed) return;
         const { width, height } = stage.getBoundingClientRect();
@@ -153,8 +177,9 @@ export function mountTshirtViewer(host, initialItem) {
       gltf.scene.traverse(object => { if (object.isMesh && !shirt) shirt = object; });
       if (!shirt?.geometry.attributes.uv) throw new Error('Model or UV missing');
       shirt.material.dispose();
-      shirt.material = new THREE.MeshStandardMaterial({ color: '#f4f1e9', roughness: .96, metalness: 0, side: THREE.DoubleSide });
+      shirt.material = cottonMaterial(); shirt.castShadow = true; shirt.receiveShadow = true;
       scene.add(shirt); shirt.updateMatrixWorld(true);
+      trims = garmentTrims(shirt.geometry); scene.add(trims); setCottonColor([shirt, trims], 'white');
       // Print only on outward-facing front triangles: never bleeds through to the back.
       const source = shirt.geometry.index ? shirt.geometry.toNonIndexed() : shirt.geometry.clone();
       const p = source.attributes.position, n = source.attributes.normal, positions = [], normals = [];

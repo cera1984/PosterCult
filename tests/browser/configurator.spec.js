@@ -11,6 +11,7 @@ async function openShirt(page) {
 test('desktop: actual WebGL rendering, colors, orbit, zoom, dynamic artwork, cleanup', async ({ page }) => {
   const errors = [], failed = [];
   page.on('pageerror', e => errors.push(e.message));
+  page.on('console', message => { if (message.type() === 'error' && /THREE|shader|GLSL|WebGL/.test(message.text())) errors.push(message.text()); });
   page.on('response', r => { if (r.status() >= 400) failed.push(r.url()); });
   await openShirt(page);
   const host = page.locator('.tshirt-viewer');
@@ -87,7 +88,7 @@ test('mobile viewport: visible controls, canvas, no horizontal overflow', async 
 });
 
 test('missing GLB: clear error and working poster fallback', async ({ page }) => {
-  await page.route('**/boxy-shirt.glb', route => route.fulfill({ status: 404, body: 'Missing' }));
+  await page.route('**/boxy-shirt.glb*', route => route.fulfill({ status: 404, body: 'Missing' }));
   await page.goto('./'); await page.locator('[data-open]').first().click();
   await page.getByRole('button', { name: 'T-shirt 3D', exact: true }).click();
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-state', 'error');
@@ -111,7 +112,7 @@ test('missing artwork: truthful error retains previous print; retry works', asyn
 
 test('closing during model download cannot mount a stale canvas', async ({ page }) => {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
-  await page.route('**/boxy-shirt.glb', async route => { await new Promise(resolve => setTimeout(resolve, 400)); await route.continue(); });
+  await page.route('**/boxy-shirt.glb*', async route => { await new Promise(resolve => setTimeout(resolve, 400)); await route.continue(); });
   await page.goto('./'); await page.locator('[data-open]').first().click();
   await page.getByRole('button', { name: 'T-shirt 3D', exact: true }).click();
   await page.getByRole('button', { name: 'Poster', exact: true }).click();
@@ -158,4 +159,23 @@ test('rapid catalog changes keep the most recent successful print', async ({ pag
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-artwork', finalId);
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-state', 'ready');
+});
+
+test('realism: 2001 artwork at an angle and closer fabric inspection', async ({ page }) => {
+  const errors = [];
+  page.on('console', message => { if (message.type() === 'error' && /THREE|shader|GLSL|WebGL/.test(message.text())) errors.push(message.text()); });
+  await page.goto('./');
+  await page.locator('#catalog-search').fill('SPACE ODDITY 10.webp');
+  await page.locator('[data-open]').first().click();
+  await page.getByRole('button', { name: 'T-shirt 3D', exact: true }).click();
+  await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-state', 'ready');
+  await page.locator('.tshirt-stage canvas').focus();
+  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight');
+  await page.getByRole('button', { name: 'Bianco', exact: true }).click();
+  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/realism-2001.png' });
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Avvicina', exact: true }).click();
+  await page.locator('.tshirt-stage').screenshot({ path: 'docs/screenshots/realism-closeup.png' });
+  await page.getByRole('button', { name: 'Nero', exact: true }).click();
+  await page.locator('.tshirt-stage').screenshot({ path: 'docs/screenshots/realism-closeup-black.png' });
+  expect(errors).toEqual([]);
 });
