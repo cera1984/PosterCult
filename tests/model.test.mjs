@@ -6,6 +6,7 @@ import vm from 'node:vm';
 import validator from 'gltf-validator';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { boundaryLoops } from '../garment-geometry.js';
+import { trackedAssetPaths } from '../scripts/asset-paths.mjs';
 
 test('self-contained GLB passes Khronos validation and recorded hash', async () => {
   const bytes = await readFile('assets/models/boxy-shirt.glb');
@@ -33,6 +34,10 @@ test('every catalog original and thumbnail remains available', async () => {
   const context = { window: {} };
   vm.runInNewContext(await readFile('gallery-data.js', 'utf8'), context);
   const items = context.window.POSTERZ_IMAGES;
+  const tracked = trackedAssetPaths();
   assert.ok(items.length > 100);
+  for (const item of items) for (const field of ['original', 'thumbnail']) {
+    assert.ok(tracked.has(item[field]), `Path must match Git exactly, including case: ${item[field]}`);
+  }
   await Promise.all(items.flatMap(item => [access(item.original), access(item.thumbnail)]));
 });
