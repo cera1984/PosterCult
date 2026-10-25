@@ -34,6 +34,7 @@ let onlyFavorites = false;
 let selectedImage = null;
 let selectedType = 'magliette';
 let selectedColor = 'vintage';
+let printScale = 1.0;
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
@@ -49,7 +50,7 @@ function imageTag(item, full = false, lazy = true) {
   return `<img src="${escapeHtml(source)}" alt="" ${lazy ? 'loading="lazy"' : ''} decoding="async" />`;
 }
 
-function mockup(item, type, full = false, lazy = true, colorKey = 'vintage') {
+function mockup(item, type, full = false, lazy = true, colorKey = 'vintage', scale = 1.0) {
   const picture = imageTag(item, full, lazy);
   if (type === 'originale') return `<div class="mockup mockup-original"><div class="original-preview">${picture}</div></div>`;
   if (type === 'poster') return `<div class="mockup mockup-poster"><div class="poster-frame">${picture}</div></div>`;
@@ -61,37 +62,28 @@ function mockup(item, type, full = false, lazy = true, colorKey = 'vintage') {
   const chestPath = isHoodie ? 'M112 115 Q180 160 248 115 L238 282 Q180 307 122 282 Z' : 'M112 116 Q180 145 248 116 L242 300 Q180 320 118 300 Z';
   const source = fileUrl(item.original);
 
-  return `<div class="mockup mockup-${isHoodie ? 'hoodie' : 'shirt'}"><div class="garment-stage" data-tilt><svg viewBox="0 0 360 390" role="img" aria-label="Anteprima su ${isHoodie ? 'felpa' : 'maglietta'}"><defs><clipPath id="${uid}"><path d="${chestPath}"/></clipPath><filter id="${uid}-shadow"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="${color.shadow}" flood-opacity=".28"/></filter></defs><g filter="url(#${uid}-shadow)"><path class="garment-base" d="${shirtPath}" fill="${color.fill}" stroke="${color.stroke}" stroke-width="2"/><path class="garment-seam" d="${isHoodie ? 'M118 75q20 45 62 68 42-23 62-68M126 83q19 34 54 51 35-17 54-51M121 317h118' : 'M149 27q31 36 62 0M101 149l-1-59m159 59 1-59M101 362h158'}"/><image href="${escapeHtml(source)}" x="102" y="105" width="156" height="210" preserveAspectRatio="xMidYMid slice" clip-path="url(#${uid})" class="garment-print-image"/><path class="garment-wrinkles" d="M124 157q28 12 42 0m29 0q18 12 40 0M128 194q22 10 43 0m19 0q20 10 39 0M133 236q20 9 36 0m24 0q17 9 34 0M150 278q18 8 29 0m18 0q17 8 27 0"/></g></svg><span class="tilt-hint">TRASCINA PER RUOTARE</span></div></div>`;
+  return `<div class="mockup mockup-${isHoodie ? 'hoodie' : 'shirt'}"><div class="garment-stage" data-tilt><svg viewBox="0 0 360 390" role="img" aria-label="Anteprima su ${isHoodie ? 'felpa' : 'maglietta'}"><defs><clipPath id="${uid}"><path d="${chestPath}"/></clipPath><filter id="${uid}-shadow"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="${color.shadow}" flood-opacity=".28"/></filter></defs><g filter="url(#${uid}-shadow)"><path class="garment-base" d="${shirtPath}" fill="${color.fill}" stroke="${color.stroke}" stroke-width="2"/><path class="garment-seam" d="${isHoodie ? 'M118 75q20 45 62 68 42-23 62-68M126 83q19 34 54 51 35-17 54-51M121 317h118' : 'M149 27q31 36 62 0M101 149l-1-59m159 59 1-59M101 362h158'}"/><image href="${escapeHtml(source)}" x="102" y="105" width="156" height="210" preserveAspectRatio="xMidYMid slice" clip-path="url(#${uid})" class="garment-print-image" transform="scale(${scale})" transform-origin="180 210"/><path class="garment-wrinkles" d="M124 157q28 12 42 0m29 0q18 12 40 0M128 194q22 10 43 0m19 0q20 10 39 0M133 236q20 9 36 0m24 0q17 9 34 0M150 278q18 8 29 0m18 0q17 8 27 0"/></g></svg><span class="tilt-hint">TRASCINA PER RUOTARE</span></div></div>`;
 }
 
 function buildFilters() {
   const groups = [...new Set(images.map(item => item.group))].sort((a, b) => a.localeCompare(b, 'it'));
   
-  // Costruiamo un menu a tendina smart per le categorie / collezioni
   categoryTabs.innerHTML = `
     <div class="smart-filters">
       <div class="filter-group">
-        <label for="category-select">Collezione / Regista:</label>
-        <select id="category-select" aria-label="Filtra per collezione o regista">
-          <option value="tutti">Tutte le collezioni (${images.length})</option>
-          ${groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('')}
-        </select>
+        <label for="category-select">Collezione:</label>
+        <select id="category-select"><option value="tutti">Tutte (${images.length})</option>${groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('')}</select>
       </div>
       <div class="filter-group" id="subgroup-wrapper" hidden>
         <label for="subgroup-select">Sottocartella:</label>
-        <select id="subgroup-select" aria-label="Filtra sottocartella">
-          <option value="tutte">Tutte le sottocartelle</option>
-        </select>
+        <select id="subgroup-select"><option value="tutte">Tutte</option></select>
       </div>
       <div class="filter-group">
         <label for="film-select">Film:</label>
-        <select id="film-select" aria-label="Filtra per film">
-          <option value="tutti">Tutti i film</option>
-        </select>
+        <select id="film-select"><option value="tutti">Tutti</option></select>
       </div>
     </div>
   `;
-
   updateSubgroupsAndFilms();
 }
 
@@ -103,8 +95,6 @@ function updateSubgroupsAndFilms() {
   if (!catSelect || !filmSel) return;
 
   category = catSelect.value;
-
-  // Sottocartelle per la categoria scelta
   const filteredForSub = category === 'tutti' ? images : images.filter(i => i.group === category);
   const subvalues = [...new Set(filteredForSub.map(i => i.subgroup).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'it'));
   
@@ -118,7 +108,6 @@ function updateSubgroupsAndFilms() {
     }
   }
 
-  // Film disponibili
   const filteredForFilms = filteredForSub.filter(i => subgroup === 'tutte' || i.subgroup === subgroup);
   const films = [...new Set(filteredForFilms.map(i => i.film))].sort((a, b) => a.localeCompare(b, 'it'));
   filmSel.innerHTML = '<option value="tutti">Tutti i film</option>' + films.map(f => `<option value="${escapeHtml(f)}" ${selectedFilm === f ? 'selected' : ''}>${escapeHtml(f)}</option>`).join('');
@@ -140,8 +129,6 @@ function updateFavoriteUI() {
   favoritesCount.textContent = String(favorites.size);
   favoritesCount.hidden = favorites.size === 0;
   favoritesToggle.classList.toggle('is-active', onlyFavorites);
-  favoritesToggle.setAttribute('aria-label', onlyFavorites ? 'Mostra tutte le immagini' : 'Mostra i preferiti');
-  favoritesToggle.title = onlyFavorites ? 'Mostra tutte' : 'Preferiti';
 }
 
 function render() {
@@ -153,69 +140,60 @@ function render() {
     (!onlyFavorites || favorites.has(item.id)) &&
     (!query || normalize(`${item.film} ${item.filename} ${item.folder} ${item.group} ${item.subgroup}`).includes(query))
   );
-
   grid.innerHTML = visible.length ? visible.map(item => `
     <article class="product-card">
       <div class="product-visual">
-        <span class="product-tag">${escapeHtml(item.group)}${item.subgroup ? ' / ' + escapeHtml(item.subgroup) : ''}</span>
-        <button class="favorite-button ${favorites.has(item.id) ? 'is-favorite' : ''}" type="button" data-favorite="${item.id}" aria-label="${favorites.has(item.id) ? 'Rimuovi' : 'Aggiungi'} ${escapeHtml(item.filename)} ${favorites.has(item.id) ? 'dai' : 'ai'} preferiti" aria-pressed="${favorites.has(item.id)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20.5 8.6c0 4.7-8.5 10-8.5 10s-8.5-5.3-8.5-10a4.6 4.6 0 0 1 8.5-2.3 4.6 4.6 0 0 1 8.5 2.3Z"/></svg></button>
-        <div class="product-open" role="button" tabindex="0" data-open="${item.id}" aria-label="Apri ${escapeHtml(item.filename)} e provalo sui prodotti">${mockup(item, 'poster', false, true, selectedColor)}</div>
+        <span class="product-tag">${escapeHtml(item.group)}</span>
+        <button class="favorite-button ${favorites.has(item.id) ? 'is-favorite' : ''}" type="button" data-favorite="${item.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.5 8.6c0 4.7-8.5 10-8.5 10s-8.5-5.3-8.5-10a4.6 4.6 0 0 1 8.5-2.3 4.6 4.6 0 0 1 8.5 2.3Z"/></svg></button>
+        <div class="product-open" role="button" tabindex="0" data-open="${item.id}">${mockup(item, 'poster', false, true, selectedColor, printScale)}</div>
       </div>
-      <div class="product-details"><div><h3>${escapeHtml(item.film)}</h3><p title="${escapeHtml(item.filename)}">${escapeHtml(item.filename)}</p></div><span class="product-price">${item.width} × ${item.height}</span></div>
-    </article>`).join('') : `<div class="empty-state"><span aria-hidden="true">✳</span><h3>${onlyFavorites && favorites.size === 0 ? 'Nessun preferito, per ora.' : 'Nessuna immagine trovata.'}</h3><p>${onlyFavorites && favorites.size === 0 ? 'Tocca il cuore su una foto per ritrovarla qui.' : 'Prova un’altra ricerca o rimuovi i filtri.'}</p><button type="button" id="empty-reset">Mostra tutte le immagini</button></div>`;
-
-  resultsCount.textContent = `${visible.length} ${visible.length === 1 ? 'immagine' : 'immagini'}${onlyFavorites ? ' · preferiti' : ''}`;
+      <div class="product-details"><div><h3>${escapeHtml(item.film)}</h3><p>${escapeHtml(item.filename)}</p></div><span class="product-price">${item.width} × ${item.height}</span></div>
+    </article>`).join('') : `<div class="empty-state"><h3>Nessuna immagine trovata.</h3><button type="button" id="empty-reset">Mostra tutte</button></div>`;
+  resultsCount.textContent = `${visible.length} ${visible.length === 1 ? 'immagine' : 'immagini'}`;
   clearFilters.hidden = category === 'tutti' && subgroup === 'tutte' && selectedFilm === 'tutti' && !query && !onlyFavorites;
   updateFavoriteUI();
 }
 
 function resetFilters() {
-  category = 'tutti';
-  subgroup = 'tutte';
-  selectedFilm = 'tutti';
-  searchInput.value = '';
-  onlyFavorites = false;
-  const catSel = document.getElementById('category-select');
-  if (catSel) catSel.value = 'tutti';
+  category = 'tutti'; subgroup = 'tutte'; selectedFilm = 'tutti'; searchInput.value = ''; onlyFavorites = false; 
+  document.getElementById('category-select').value = 'tutti';
   updateSubgroupsAndFilms();
   render();
 }
 
 function toggleFavorite(id) {
   if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
-  try { localStorage.setItem(storageKey, JSON.stringify([...favorites])); } catch { /* Facoltativo */ }
+  try { localStorage.setItem(storageKey, JSON.stringify([...favorites])); } catch { }
   render();
 }
 
 function renderDialog() {
-  disposeTshirtViewer();
   if (!selectedImage) return;
   const item = selectedImage;
   const isGarment = selectedType === 'magliette' || selectedType === 'felpe';
 
   dialogContent.innerHTML = `
     <div class="dialog-layout">
-      <div class="dialog-preview">${mockup(item, selectedType, true, false, selectedColor)}</div>
+      <div class="dialog-preview">${mockup(item, selectedType, true, false, selectedColor, printScale)}</div>
       <div class="dialog-info">
-        <span class="section-index">${escapeHtml(item.group)}${item.subgroup ? ' / ' + escapeHtml(item.subgroup) : ''} / ${escapeHtml(item.folder)}</span>
+        <span class="section-index">${escapeHtml(item.group)} / ${escapeHtml(item.folder)}</span>
         <h2 id="dialog-title">${escapeHtml(item.film)}</h2>
-        <p class="dialog-description">${escapeHtml(item.filename)}<br />${item.width} × ${item.height} pixel · ${escapeHtml(item.filename.split('.').pop().toUpperCase())}</p>
         
-        <p class="dialog-label">SCEGLI TIPO DI ANTEPRIMA</p>
-        <div class="variant-list" role="group" aria-label="Seleziona anteprima">
-          ${Object.entries(productTypes).map(([type, label]) => `<button class="variant-button ${selectedType === type ? 'is-selected' : ''}" type="button" data-variant="${type}" aria-pressed="${selectedType === type}">${label}</button>`).join('')}
+        <p class="dialog-label">SCEGLI CAPO</p>
+        <div class="variant-list">
+          ${Object.entries(productTypes).map(([type, label]) => `<button class="variant-button ${selectedType === type ? 'is-selected' : ''}" data-variant="${type}">${label}</button>`).join('')}
         </div>
 
         ${isGarment ? `
-          <p class="dialog-label">COLORE DEL CAPO</p>
-          <div class="color-list" role="group" aria-label="Seleziona colore capo">
-            ${Object.entries(garmentColors).map(([key, col]) => `<button class="color-button ${selectedColor === key ? 'is-selected' : ''}" type="button" data-color="${key}" style="background-color: ${col.fill};" title="${col.name}" aria-label="${col.name}" aria-pressed="${selectedColor === key}"></button>`).join('')}
+          <p class="dialog-label">COLORE</p>
+          <div class="color-list">
+            ${Object.entries(garmentColors).map(([key, col]) => `<button class="color-button ${selectedColor === key ? 'is-selected' : ''}" data-color="${key}" style="background-color: ${col.fill};" title="${col.name}"></button>`).join('')}
           </div>
+          <p class="dialog-label">DIMENSIONE GRAFICA</p>
+          <input type="range" class="size-slider" min="0.5" max="1.5" step="0.1" value="${printScale}" id="scale-slider">
         ` : ''}
 
-        <p class="dialog-price">Il file originale è nel tuo archivio.</p>
-        <a class="button button-dark original-link" href="${escapeHtml(fileUrl(item.original))}" target="_blank" rel="noopener">Apri il file originale <span aria-hidden="true">↗</span></a>
-        <p class="dialog-note">Simulazione di stampa personale. Trascina l'anteprima per ruotarla in 3D. Verifica risoluzione e formato con chi stampa.</p>
+        <a class="button button-dark" href="${escapeHtml(fileUrl(item.original))}" target="_blank">Apri file originale</a>
       </div>
     </div>
   `;
@@ -224,38 +202,29 @@ function renderDialog() {
 function openDialog(id) {
   selectedImage = images.find(item => item.id === id);
   if (!selectedImage) return;
-  selectedType = 'poster';
+  selectedType = 'magliette';
   renderDialog();
   dialog.showModal();
   document.body.classList.add('dialog-open');
 }
 
 buildFilters();
+updateSubgroups();
 setFeatured();
 render();
 
-// Event Listeners per i filtri smart
+// Event Listeners
 categoryTabs.addEventListener('change', event => {
   if (event.target.id === 'category-select') {
-    category = event.target.value;
-    subgroup = 'tutte';
-    selectedFilm = 'tutti';
-    updateSubgroupsAndFilms();
-    render();
+    category = event.target.value; subgroup = 'tutte'; selectedFilm = 'tutti'; updateSubgroupsAndFilms(); render();
   } else if (event.target.id === 'subgroup-select') {
-    subgroup = event.target.value;
-    selectedFilm = 'tutti';
-    updateSubgroupsAndFilms();
-    render();
+    subgroup = event.target.value; selectedFilm = 'tutti'; updateSubgroupsAndFilms(); render();
   } else if (event.target.id === 'film-select') {
-    selectedFilm = event.target.value;
-    render();
+    selectedFilm = event.target.value; render();
   }
 });
-
 searchInput.addEventListener('input', render);
 clearFilters.addEventListener('click', resetFilters);
-
 grid.addEventListener('click', event => {
   const favorite = event.target.closest('[data-favorite]');
   if (favorite) return toggleFavorite(favorite.dataset.favorite);
@@ -263,66 +232,16 @@ grid.addEventListener('click', event => {
   if (open) openDialog(open.dataset.open);
   if (event.target.id === 'empty-reset') resetFilters();
 });
-
-grid.addEventListener('keydown', event => {
-  if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('[data-open]')) {
-    event.preventDefault(); openDialog(event.target.dataset.open);
-  }
-});
-
-favoritesToggle.addEventListener('click', () => {
-  onlyFavorites = !onlyFavorites; render(); document.getElementById('collezione').scrollIntoView({ behavior: 'smooth' });
-});
-
-document.getElementById('search-toggle').addEventListener('click', () => {
-  document.getElementById('collezione').scrollIntoView({ behavior: 'smooth' });
-  searchInput.focus({ preventScroll: true });
-});
-
-document.getElementById('dialog-close').addEventListener('click', () => dialog.close());
-dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
 dialog.addEventListener('close', () => { document.body.classList.remove('dialog-open'); selectedImage = null; });
-
 dialogContent.addEventListener('click', event => {
   const variantBtn = event.target.closest('[data-variant]');
-  if (variantBtn) {
-    selectedType = variantBtn.dataset.variant;
-    renderDialog();
-    return;
-  }
+  if (variantBtn) { selectedType = variantBtn.dataset.variant; renderDialog(); return; }
   const colorBtn = event.target.closest('[data-color]');
-  if (colorBtn) {
-    selectedColor = colorBtn.dataset.color;
-    renderDialog();
-    return;
-  }
+  if (colorBtn) { selectedColor = colorBtn.dataset.color; renderDialog(); return; }
 });
-
-document.addEventListener('pointermove', event => {
-  const stage = event.target.closest('[data-tilt]');
-  if (!stage || !stage.hasPointerCapture?.(event.pointerId)) return;
-  const rect = stage.getBoundingClientRect();
-  const x = ((event.clientX - rect.left) / rect.width - .5) * 18;
-  const y = ((event.clientY - rect.top) / rect.height - .5) * -12;
-  stage.style.setProperty('--tilt-x', `${x}deg`);
-  stage.style.setProperty('--tilt-y', `${y}deg`);
+dialogContent.addEventListener('input', event => {
+  if (event.target.id === 'scale-slider') { printScale = parseFloat(event.target.value); renderDialog(); }
 });
-document.addEventListener('pointerdown', event => {
-  const stage = event.target.closest('[data-tilt]');
-  if (stage) stage.setPointerCapture?.(event.pointerId);
-});
-document.addEventListener('pointerup', event => {
-  const stage = event.target.closest('[data-tilt]');
-  if (stage) { stage.releasePointerCapture?.(event.pointerId); stage.style.setProperty('--tilt-x', '0deg'); stage.style.setProperty('--tilt-y', '0deg'); }
-});
-
 const menuToggle = document.getElementById('menu-toggle');
 const mobileNav = document.getElementById('mobile-nav');
-menuToggle.addEventListener('click', () => {
-  mobileNav.hidden = !mobileNav.hidden;
-  menuToggle.setAttribute('aria-expanded', String(!mobileNav.hidden));
-  menuToggle.setAttribute('aria-label', mobileNav.hidden ? 'Apri menu' : 'Chiudi menu');
-});
-mobileNav.addEventListener('click', event => {
-  if (event.target.closest('a')) { mobileNav.hidden = true; menuToggle.setAttribute('aria-expanded', 'false'); menuToggle.setAttribute('aria-label', 'Apri menu'); }
-});
+menuToggle.addEventListener('click', () => { mobileNav.hidden = !mobileNav.hidden; });
