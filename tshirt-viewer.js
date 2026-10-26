@@ -6,17 +6,18 @@ import { RoomEnvironment } from './vendor/three/examples/jsm/environments/RoomEn
 import { cottonMaterial, garmentTrims, setCottonColor } from './garment-material.js?v=catalog-restore-1';
 import { GARMENT_COLORS } from './garment-palette.js';
 import { printDimensions } from './print-layout.js';
-import { createHoodieModel } from './hoodie-model.js?v=editor-hoodie-2';
+import { prepareHoodieModel } from './hoodie-model.js?v=editor-hoodie-3';
 import { normalizeLayerConfig, normalizeCompositions } from './print-compositions.js?v=editor-hoodie-2';
 
 const modelUrl = new URL('./assets/models/boxy-shirt.glb?v=fit-scale-1', import.meta.url).href;
+const hoodieModelUrl = new URL('./assets/models/premium-eco-hoodie.glb?v=hoodie-premium-1', import.meta.url).href;
 
 // One viewer per open dialog. Every asynchronous completion checks disposal/version.
 export function mountTshirtViewer(host, initialItem, { editorPanel, compositionPanel } = {}) {
   const status = host.querySelector('[data-viewer-status]');
   const stage = host.querySelector('[data-viewer-stage]');
   const controlsPanel = host.querySelector('[data-viewer-controls]');
-  let disposed = false, shirt, frontSurface, backSurface, hoodieDetails, hoodieBody, hoodieTrims, hoodieFrontSurface, hoodieBackSurface;
+  let disposed = false, shirt, frontSurface, backSurface, hoodieDetails, hoodieBodyMeshes = [], hoodieFrontSurface, hoodieBackSurface;
   let garment = 'tshirt';
   let layers = [], selectedLayer = null, layerSequence = 0;
   let renderer, controls, observer, trims, environmentTarget, groundTexture;
@@ -70,7 +71,7 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
     if (button.dataset.view === 'out') zoom(1.15);
     if (Object.hasOwn(GARMENT_COLORS, button.dataset.view)) {
       const color = button.dataset.view;
-      setCottonColor([shirt, trims, hoodieDetails, hoodieTrims], color);
+      setCottonColor([shirt, trims, hoodieDetails], color);
       host.dataset.color = color;
       host.querySelectorAll('[data-view="white"], [data-view="black"], [data-view="grey"], [data-view="vintage"]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
       render();
@@ -81,15 +82,14 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
     garment = event.target.value;
     host.dataset.garment = garment;
     if (hoodieDetails) hoodieDetails.visible = garment === 'hoodie';
-    if (hoodieTrims) hoodieTrims.visible = garment === 'hoodie';
     if (shirt) shirt.visible = garment === 'tshirt';
     if (trims) trims.visible = garment === 'tshirt';
     renderer.domElement.setAttribute('aria-label', `${garment === 'hoodie' ? 'Felpa con cappuccio' : 'T-shirt'} 3D. Frecce per ruotare; più e meno per zoomare.`);
     for (const layer of layers) updateLayer(layer);
     const dialogLabel = host.closest('#dialog-content')?.querySelector('.dialog-label');
-    if (dialogLabel) dialogLabel.textContent = garment === 'hoodie' ? 'FELPA CON CAPPUCCIO · PROTOTIPO 3D' : 'T-SHIRT BOXY · PROTOTIPO 3D';
+    if (dialogLabel) dialogLabel.textContent = garment === 'hoodie' ? 'PREMIUM ECO HOODIE · MODELLO 3D' : 'T-SHIRT BOXY · MODELLO 3D';
     updateCompositionsList();
-    setStatus(garment === 'hoodie' ? 'Felpa con cappuccio · modello indicativo' : 'T-shirt boxy · modello indicativo', 'ready');
+    setStatus(garment === 'hoodie' ? 'Premium Eco Hoodie · modello 3D' : 'T-shirt boxy · modello 3D', 'ready');
     render();
   };
   const onContextLost = event => { event.preventDefault(); setStatus('La vista 3D è stata interrotta. Torna a Poster e riapri T-shirt 3D.', 'error'); };
@@ -372,26 +372,35 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
       shirt.material = cottonMaterial(); shirt.castShadow = true; shirt.receiveShadow = true;
       scene.add(shirt); shirt.updateMatrixWorld(true);
       trims = garmentTrims(shirt.geometry); scene.add(trims);
-      hoodieDetails = createHoodieModel(); hoodieDetails.visible = false; scene.add(hoodieDetails);
-      hoodieBody = hoodieDetails.userData.body;
-      hoodieTrims = garmentTrims(hoodieBody.geometry); hoodieDetails.add(hoodieTrims); hoodieTrims.visible = false;
-      setCottonColor([shirt, trims, hoodieDetails, hoodieTrims], 'white');
       // Separate front and back targets keep prints attached to the selected garment.
-      const makeSurface = (sourceGeometry, front) => {
-        const source = sourceGeometry.index ? sourceGeometry.toNonIndexed() : sourceGeometry.clone();
-        const p = source.attributes.position, n = source.attributes.normal, positions = [], normals = [];
-        for (let i = 0; i < p.count; i += 3) {
-          const nz = (n.getZ(i) + n.getZ(i + 1) + n.getZ(i + 2)) / 3;
-          const z = (p.getZ(i) + p.getZ(i + 1) + p.getZ(i + 2)) / 3;
-          if (front ? nz < .3 || z < 0 : nz > -.3 || z > 0) continue;
-          for (let j = i; j < i + 3; j++) { positions.push(p.getX(j), p.getY(j), p.getZ(j)); normals.push(n.getX(j), n.getY(j), n.getZ(j)); }
+      const makeSurface = (sourceMeshes, front) => {
+        const positions = [], normals = [];
+        for (const sourceMesh of sourceMeshes) {
+          sourceMesh.updateWorldMatrix(true, false);
+          const sourceGeometry = sourceMesh.geometry;
+          const source = sourceGeometry.index ? sourceGeometry.toNonIndexed() : sourceGeometry.clone();
+          source.applyMatrix4(sourceMesh.matrixWorld);
+          const p = source.attributes.position, n = source.attributes.normal;
+          for (let i = 0; i < p.count; i += 3) {
+            const nz = (n.getZ(i) + n.getZ(i + 1) + n.getZ(i + 2)) / 3;
+            const z = (p.getZ(i) + p.getZ(i + 1) + p.getZ(i + 2)) / 3;
+            if (front ? nz < .3 || z < 0 : nz > -.3 || z > 0) continue;
+            for (let j = i; j < i + 3; j++) { positions.push(p.getX(j), p.getY(j), p.getZ(j)); normals.push(n.getX(j), n.getY(j), n.getZ(j)); }
+          }
+          source.dispose();
         }
-        source.dispose(); const geometry = new THREE.BufferGeometry();
+        const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)); geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
         const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial()); mesh.updateMatrixWorld(true); return mesh;
       };
-      frontSurface = makeSurface(shirt.geometry, true); backSurface = makeSurface(shirt.geometry, false);
-      hoodieFrontSurface = makeSurface(hoodieBody.geometry, true); hoodieBackSurface = makeSurface(hoodieBody.geometry, false);
+      frontSurface = makeSurface([shirt], true); backSurface = makeSurface([shirt], false);
+      const hoodieGltf = await new GLTFLoader().loadAsync(hoodieModelUrl);
+      if (disposed) { hoodieGltf.scene.traverse(o => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } }); return; }
+      const hoodieModel = prepareHoodieModel(hoodieGltf);
+      hoodieDetails = hoodieModel.group; hoodieBodyMeshes = hoodieModel.bodyMeshes;
+      hoodieDetails.visible = false; scene.add(hoodieDetails);
+      setCottonColor([shirt, trims, hoodieDetails], 'white');
+      hoodieFrontSurface = makeSurface(hoodieBodyMeshes, true); hoodieBackSurface = makeSurface(hoodieBodyMeshes, false);
       controlsPanel.disabled = false; editorReady = true; editorPanel?.removeAttribute('data-disabled'); syncLayerSelect();
       host.addEventListener('click', onAction);
       host.addEventListener('change', onGarmentChange);

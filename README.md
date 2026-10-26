@@ -1,20 +1,21 @@
 # Fuori Campo — archivio personale
 
-## Prototipo T-shirt 3D
+## Configuratore 3D
 
-Nella scheda di ogni poster è disponibile **T-shirt 3D**: rotazione a 360°,
-zoom, bianco/nero/grigio/panna vintage e scelta della grafica dal catalogo. La vista poster resta
-quella predefinita. Per il 3D aprire il sito da GitHub Pages oppure eseguire
+Nella scheda di ogni poster è disponibile **T-shirt 3D**: seleziona T-shirt o
+felpa, ruota il capo a 360°, scegli il colore e aggiungi più grafiche sul
+fronte o sul retro. Ogni grafica ha posizione, scala, rotazione, ribaltamento
+e ritaglio indipendenti; le composizioni si salvano sul dispositivo. La vista
+poster resta quella predefinita. Per il 3D aprire il sito da GitHub Pages oppure eseguire
 `npm ci` e `npm run serve`, quindi visitare `http://127.0.0.1:4173/`.
 La modalità `file://` descritta sotto supporta il catalogo, ma non il 3D.
 
-Modello CC0 acquisito da MakeHuman e adattato boxy; anteprima indicativa,
-senza simulazione di vestibilità o file di stampa. [Fonte, licenza, UV e
-limiti](docs/T-SHIRT-3D.md). [Risultati dei test](docs/VALIDATION.md).
+La T-shirt boxy usa un modello CC0 di MakeHuman adattato; la felpa usa il
+Premium Eco Hoodie di lekuns, distribuito con licenza CC BY 4.0. Le anteprime
+sono indicative: non simulano vestibilità o stampa fisica. [Fonti, licenze,
+UV e limiti](docs/T-SHIRT-3D.md). [Risultati dei test](docs/VALIDATION.md).
 
-Le istruzioni seguenti descrivono l'archivio locale originale; le vecchie
-anteprime di felpa/maglietta inclinate sono state sostituite dal prototipo
-3D della sola T-shirt.
+Le istruzioni seguenti descrivono l'archivio locale originale.
 
 Apri **`E:\POSTERZ\site\index.html`** nel browser. Non occorrono account né connessione internet. Il sito non invia foto online e non offre acquisti.
 

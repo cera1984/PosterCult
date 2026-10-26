@@ -1,4 +1,4 @@
-# T-shirt boxy: prototipo con dettagli del tessuto
+# Configuratore 3D: T-shirt boxy e felpa
 
 Aprire il sito via HTTP/HTTPS, selezionare un poster e scegliere **T-shirt 3D**.
 Trascinare per ruotare senza limiti sull'asse verticale; usare rotella/pizzico o i
@@ -23,7 +23,7 @@ del riquadro per occupare al massimo circa il 70% della vista all'apertura.
 Il catalogo, i filtri, i preferiti e la vista poster/originale usano il codice
 esistente. Three.js e il modello si caricano solo scegliendo T-shirt 3D.
 
-## Modello e acquisizione
+## Modello T-shirt e acquisizione
 
 - Fonte ufficiale: [MakeHuman Shirts01](https://static.makehumancommunity.org/assets/assetpacks/shirts01.html).
 - Download ufficiale gratuito, senza account: [shirts01_cc0.zip](https://files2.makehumancommunity.org/asset_packs/shirts01/shirts01_cc0.zip).
@@ -43,6 +43,14 @@ ammorbiditi, scollo più stretto e pieghe statiche leggere. Il file
 GLB risultante è autosufficiente; non contiene avatar, texture del pacchetto,
 animazioni o riferimenti esterni. Anche questo adattamento geometrico viene
 distribuito sotto CC0 1.0. La licenza non si estende alle immagini del catalogo.
+
+## Modello felpa
+
+- Modello: [Premium Eco Hoodie](https://sketchfab.com/3d-models/premium-eco-hoodie-e1d8b7ad9a0b4f3bba883ec3c02e4f08), di [lekuns](https://sketchfab.com/lekuns), scaricato dal pacchetto fornito per questa integrazione.
+- Licenza: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Il modello richiede attribuzione; la vista 3D e questo documento citano autore, fonte, licenza e modifiche.
+- GLB incluso: `assets/models/premium-eco-hoodie.glb`, validato con il validatore Khronos.
+- Modifiche: adattamento di materiale e colore al configuratore, posizionamento nella scena e superfici di proiezione distinte per fronte e retro.
+- Il modello è statico e non rappresenta taglie certificate o un capo fisicamente misurato. Le grafiche sono anteprime, non file per la produzione.
 
 Alternative esaminate ma non incluse:
 
@@ -70,27 +78,26 @@ orizzontale viene ridotta, senza tagliarla o stirarla. La texture è limitata a
 
 ## Limiti
 
-Colletto, bordi arrotolati e linee di doppia cucitura sono generati sui quattro
-bordi aperti del modello. Sono dettagli visivi, non un cartamodello sartoriale.
-Il materiale usa sheen, una trama procedurale condivisa tra tessuto e stampa,
-un ambiente studio generato localmente, luci laterali e ombre del capo su sé
-stesso. L'ombra morbida sotto il capo è un gradiente grafico. Nessuna nuova
-texture fotografica o modello di terzi è stato acquisito per questo affinamento.
+Sulla T-shirt, colletto, bordi arrotolati e linee di doppia cucitura sono
+generati sui bordi aperti: sono dettagli visivi, non un cartamodello sartoriale.
+Entrambi i capi usano sheen, una trama procedurale condivisa tra tessuto e
+stampa, un ambiente studio generato localmente, luci laterali e ombre del capo
+su sé stesso. L'ombra morbida sotto il capo è un gradiente grafico.
 
 - Anteprima di forma e grafica: nessuna simulazione fisica di cotone, caduta,
   taglia, cuciture, spessore, vestibilità o resa di stampa reale.
-- Modello rifinito a mano tramite codice, non una scansione o un mockup
-  fotorealistico; pieghe statiche, senza simulazione fisica.
-- Stampa solo frontale, centrata, dimensione regolabile; nessun posizionamento
-  libero, stampa sul retro, esportazione o file di produzione.
+- La T-shirt è un adattamento geometrico tramite codice; la felpa usa il GLB
+  di lekuns. Nessuno dei due è una scansione del capo fisico o simula il tessuto.
+- Le grafiche sono posizionabili sul fronte o sul retro e modificabili
+  indipendentemente; non sono esportabili come file di produzione.
 - Nessuna rimozione automatica dello sfondo delle immagini.
 - WebGL 2 e browser moderno con moduli/import map richiesti per il 3D.
   Aprire direttamente `index.html` come `file://` non supporta il 3D;
   il catalogo e le viste poster/originale restano indipendenti dal modulo.
 - La verifica mobile usa un viewport Chromium: non sostituisce prove su
   dispositivi fisici, Safari o Firefox.
-- La licenza CC0 riguarda il modello. I diritti delle grafiche del catalogo
-  non sono stati verificati e non vengono attribuiti dalla licenza del modello.
+- La T-shirt è CC0; la felpa è CC BY 4.0 e richiede l'attribuzione descritta
+  sopra. I diritti delle grafiche del catalogo richiedono una verifica separata.
 
 ## Sviluppo e verifica riproducibile
 

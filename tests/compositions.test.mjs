@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { normalizeCompositions, normalizeLayerConfig } from '../print-compositions.js';
-import { createHoodieModel } from '../hoodie-model.js';
-import { boundaryLoops } from '../garment-geometry.js';
+import validator from 'gltf-validator';
 
 test('legacy compositions migrate without colliding with a hoodie of the same name', () => {
   const saved = normalizeCompositions({
@@ -28,16 +28,18 @@ test('damaged local storage cannot introduce invalid print transforms or colors'
   assert.equal(normalizeLayerConfig({ x: -200, y: 500, crop: 999 }).crop, 300);
 });
 
-test('hoodie torso has only neck and hem boundaries, without a false center seam', () => {
-  const model = createHoodieModel(), body = model.userData.body;
-  assert.ok(body.geometry.attributes.uv);
-  const loops = boundaryLoops(body.geometry);
-  assert.equal(loops.length, 2);
-  for (const loop of loops) {
-    const ys = loop.map(point => point.y);
-    assert.ok(Math.max(...ys) - Math.min(...ys) < .000001);
+test('Premium Eco Hoodie GLB is valid and includes textured UV garment meshes', async () => {
+  const bytes = new Uint8Array(await readFile(new URL('../assets/models/premium-eco-hoodie.glb', import.meta.url)));
+  const report = await validator.validateBytes(bytes, { uri: 'premium-eco-hoodie.glb' });
+  assert.equal(report.issues.numErrors, 0, JSON.stringify(report.issues.messages));
+  assert.ok(report.info.animationCount === 0);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let offset = 12, document;
+  while (offset < bytes.byteLength) {
+    const length = view.getUint32(offset, true), type = view.getUint32(offset + 4, true);
+    if (type === 0x4e4f534a) document = JSON.parse(new TextDecoder().decode(bytes.subarray(offset + 8, offset + 8 + length)).trim());
+    offset += 8 + length;
   }
-  const normals = body.geometry.attributes.normal;
-  assert.ok(Array.from(normals.array).every(Number.isFinite));
-  model.traverse(mesh => { mesh.geometry?.dispose(); mesh.material?.dispose(); });
+  assert.ok(document.images?.length, 'the packaged GLB should keep its embedded source texture');
+  assert.ok(document.meshes.some(mesh => mesh.name.startsWith('Pattern_') && mesh.primitives.some(primitive => primitive.attributes.TEXCOORD_0 !== undefined)));
 });
