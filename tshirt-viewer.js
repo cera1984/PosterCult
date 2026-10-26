@@ -6,11 +6,12 @@ import { RoomEnvironment } from './vendor/three/examples/jsm/environments/RoomEn
 import { cottonMaterial, garmentTrims, setCottonColor } from './garment-material.js?v=catalog-restore-1';
 import { GARMENT_COLORS } from './garment-palette.js';
 import { printDimensions } from './print-layout.js';
-import { prepareHoodieModel } from './hoodie-model.js?v=editor-hoodie-3';
+import { prepareHoodieModel, prepareStudioHoodieModel } from './hoodie-model.js?v=studio-hoodie-1';
 import { normalizeLayerConfig, normalizeCompositions } from './print-compositions.js?v=editor-hoodie-2';
 
 const modelUrl = new URL('./assets/models/boxy-shirt.glb?v=fit-scale-1', import.meta.url).href;
 const hoodieModelUrl = new URL('./assets/models/premium-eco-hoodie.glb?v=hoodie-premium-1', import.meta.url).href;
+const studioHoodieModelUrl = new URL('./assets/models/hoodie-yogaminggames.glb?v=hoodie-yogaminggames-1', import.meta.url).href;
 
 // One viewer per open dialog. Every asynchronous completion checks disposal/version.
 export function mountTshirtViewer(host, initialItem, { editorPanel, compositionPanel } = {}) {
@@ -18,6 +19,7 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
   const stage = host.querySelector('[data-viewer-stage]');
   const controlsPanel = host.querySelector('[data-viewer-controls]');
   let disposed = false, shirt, frontSurface, backSurface, hoodieDetails, hoodieBodyMeshes = [], hoodieFrontSurface, hoodieBackSurface;
+  let studioHoodieDetails, studioHoodieFrontSurface, studioHoodieBackSurface, studioHoodiePromise;
   let garment = 'tshirt';
   let layers = [], selectedLayer = null, layerSequence = 0;
   let renderer, controls, observer, trims, environmentTarget, groundTexture;
@@ -71,25 +73,71 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
     if (button.dataset.view === 'out') zoom(1.15);
     if (Object.hasOwn(GARMENT_COLORS, button.dataset.view)) {
       const color = button.dataset.view;
-      setCottonColor([shirt, trims, hoodieDetails], color);
+      setCottonColor([shirt, trims, hoodieDetails, studioHoodieDetails], color);
       host.dataset.color = color;
       host.querySelectorAll('[data-view="white"], [data-view="black"], [data-view="grey"], [data-view="vintage"]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
       render();
     }
   };
-  const onGarmentChange = event => {
+  const makeSurfaceFor = (sourceMeshes, front) => {
+    const positions = [], normals = [];
+    for (const sourceMesh of sourceMeshes) {
+      sourceMesh.updateWorldMatrix(true, false);
+      const sourceGeometry = sourceMesh.geometry.index ? sourceMesh.geometry.toNonIndexed() : sourceMesh.geometry.clone();
+      sourceGeometry.applyMatrix4(sourceMesh.matrixWorld);
+      const p = sourceGeometry.attributes.position, n = sourceGeometry.attributes.normal;
+      for (let i = 0; i < p.count; i += 3) {
+        const nz = (n.getZ(i) + n.getZ(i + 1) + n.getZ(i + 2)) / 3;
+        const z = (p.getZ(i) + p.getZ(i + 1) + p.getZ(i + 2)) / 3;
+        if (front ? nz < .3 || z < 0 : nz > -.3 || z > 0) continue;
+        for (let j = i; j < i + 3; j++) { positions.push(p.getX(j), p.getY(j), p.getZ(j)); normals.push(n.getX(j), n.getY(j), n.getZ(j)); }
+      }
+      sourceGeometry.dispose();
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+    const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial()); mesh.updateMatrixWorld(true); return mesh;
+  };
+  const ensureStudioHoodie = () => {
+    if (!studioHoodiePromise) studioHoodiePromise = (async () => {
+      const gltf = await new GLTFLoader().loadAsync(studioHoodieModelUrl);
+      if (disposed) { gltf.scene.traverse(o => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } }); return; }
+      const model = prepareStudioHoodieModel(gltf);
+      studioHoodieDetails = model.group; studioHoodieDetails.visible = false; scene.add(studioHoodieDetails);
+      setCottonColor([shirt, trims, hoodieDetails, studioHoodieDetails], host.dataset.color || 'white');
+      studioHoodieFrontSurface = makeSurfaceFor(model.bodyMeshes, true);
+      studioHoodieBackSurface = makeSurfaceFor(model.bodyMeshes, false);
+      return studioHoodieDetails;
+    })();
+    return studioHoodiePromise;
+  };
+  const onGarmentChange = async event => {
     if (!event.target.matches('[data-garment-select]')) return;
     garment = event.target.value;
     host.dataset.garment = garment;
     if (hoodieDetails) hoodieDetails.visible = garment === 'hoodie';
+    if (studioHoodieDetails) studioHoodieDetails.visible = garment === 'hoodie-alt';
     if (shirt) shirt.visible = garment === 'tshirt';
     if (trims) trims.visible = garment === 'tshirt';
-    renderer.domElement.setAttribute('aria-label', `${garment === 'hoodie' ? 'Felpa con cappuccio' : 'T-shirt'} 3D. Frecce per ruotare; più e meno per zoomare.`);
+    const garmentName = garment === 'hoodie' ? 'Premium Eco Hoodie' : garment === 'hoodie-alt' ? 'Felpa Yogaminggames' : 'T-shirt boxy';
+    renderer.domElement.setAttribute('aria-label', `${garmentName} 3D. Frecce per ruotare; più e meno per zoomare.`);
+    if (garment === 'hoodie-alt' && !studioHoodieDetails) {
+      setStatus('Caricamento della felpa…', 'loading');
+      try {
+        await ensureStudioHoodie();
+        if (disposed || garment !== 'hoodie-alt') return;
+        studioHoodieDetails.visible = true;
+      } catch (error) {
+        if (!disposed) setStatus('Felpa non caricata. Riprova o seleziona un altro capo.', 'error');
+        console.warn('PosterCult hoodie model:', error); return;
+      }
+    }
     for (const layer of layers) updateLayer(layer);
     const dialogLabel = host.closest('#dialog-content')?.querySelector('.dialog-label');
-    if (dialogLabel) dialogLabel.textContent = garment === 'hoodie' ? 'PREMIUM ECO HOODIE · MODELLO 3D' : 'T-SHIRT BOXY · MODELLO 3D';
+    if (dialogLabel) dialogLabel.textContent = garment === 'hoodie' ? 'PREMIUM ECO HOODIE · MODELLO 3D' : garment === 'hoodie-alt' ? 'FELPA YOGAMINGGAMES · MODELLO 3D' : 'T-SHIRT BOXY · MODELLO 3D';
     updateCompositionsList();
-    setStatus(garment === 'hoodie' ? 'Premium Eco Hoodie · modello 3D' : 'T-shirt boxy · modello 3D', 'ready');
+    setStatus(`${garmentName} · modello 3D`, 'ready');
     render();
   };
   const onContextLost = event => { event.preventDefault(); setStatus('La vista 3D è stata interrotta. Torna a Poster e riapri T-shirt 3D.', 'error'); };
@@ -151,9 +199,11 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
     editorPanel.querySelectorAll('[data-print-scale]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.printScale) === layer.scale)));
   }
   function updateLayer(layer) {
-    const target = garment === 'hoodie'
-      ? (layer.side === 'front' ? hoodieFrontSurface : hoodieBackSurface)
-      : (layer.side === 'front' ? frontSurface : backSurface);
+    const target = garment === 'hoodie-alt'
+      ? (layer.side === 'front' ? studioHoodieFrontSurface : studioHoodieBackSurface)
+      : garment === 'hoodie'
+        ? (layer.side === 'front' ? hoodieFrontSurface : hoodieBackSurface)
+        : (layer.side === 'front' ? frontSurface : backSurface);
     if (!target || !layer.texture) return;
     const { width, height } = printDimensions(layer.texture.image.width / layer.texture.image.height, layer.scale);
     const center = new THREE.Vector3(layer.x * .0048, -.02 - layer.y * .0042, layer.side === 'front' ? .25 : -.25);
@@ -305,7 +355,7 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
     }
     releasePrint();
-    for (const surface of [frontSurface, backSurface, hoodieFrontSurface, hoodieBackSurface]) { surface?.geometry.dispose(); surface?.material.dispose(); }
+    for (const surface of [frontSurface, backSurface, hoodieFrontSurface, hoodieBackSurface, studioHoodieFrontSurface, studioHoodieBackSurface]) { surface?.geometry.dispose(); surface?.material.dispose(); }
     scene.traverse(object => { object.geometry?.dispose(); object.material?.dispose(); });
     environmentTarget?.dispose();
     groundTexture?.dispose();

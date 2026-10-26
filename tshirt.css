@@ -19,7 +19,11 @@
 .print-size-controls:disabled{opacity:.5}
 .dialog-preview:has(.tshirt-viewer){height:min(80vh,720px);min-height:530px;align-items:stretch;align-self:start;position:sticky;top:0}
 .dialog-preview .tshirt-viewer{min-height:0}.dialog-preview .tshirt-stage{min-height:240px}
-@media(max-width:760px){.dialog-layout:has(.tshirt-viewer){grid-template-columns:1fr}.dialog-preview:has(.tshirt-viewer){height:560px;min-height:560px;position:relative}.dialog-preview .tshirt-stage{min-height:250px}}
+.phonecase-viewer{width:100%;height:100%;display:flex;flex-direction:column;padding:22px 12px 12px;min-height:530px;background:radial-gradient(ellipse at 50% 35%,#f7f4ec,#d8d9cf);position:relative}
+.phonecase-stage{flex:1;min-height:350px;width:100%;position:relative;touch-action:none}.phonecase-stage canvas{display:block;width:100%;height:100%;position:absolute;inset:0;cursor:grab;outline-offset:-3px}.phonecase-stage canvas:active{cursor:grabbing}.phonecase-stage canvas:focus-visible{outline:2px solid #a05b43}
+.phonecase-viewer[data-state=error] .tshirt-status{color:#853b26}
+.dialog-preview:has(.phonecase-viewer){height:min(80vh,720px);min-height:530px;align-items:stretch;align-self:start;position:sticky;top:0}.dialog-preview .phonecase-viewer{min-height:0}.dialog-preview .phonecase-stage{min-height:240px}
+@media(max-width:760px){.dialog-layout:has(.tshirt-viewer),.dialog-layout:has(.phonecase-viewer){grid-template-columns:1fr}.dialog-preview:has(.tshirt-viewer),.dialog-preview:has(.phonecase-viewer){height:560px;min-height:560px;position:relative}.dialog-preview .tshirt-stage,.dialog-preview .phonecase-stage{min-height:250px}}
 .print-editor,.compositions{border-top:1px solid #c5c7b9;padding:14px 0 0;margin:18px 0 0;display:grid;gap:7px}
 .print-editor[data-disabled=true]{opacity:.55}
 .editor-heading,.editor-row{display:flex;align-items:center;gap:8px}.editor-heading{justify-content:space-between;margin-bottom:5px}.editor-heading strong{font-size:13px}

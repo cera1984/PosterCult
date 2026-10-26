@@ -33,3 +33,32 @@ export function prepareHoodieModel(gltf) {
   group.updateMatrixWorld(true);
   return { group, bodyMeshes };
 }
+
+// Prepare the user-provided Hoodie model. Its fabric is split across four mesh
+// nodes and is already metre-scaled and upright in the GLB hierarchy.
+export function prepareStudioHoodieModel(gltf) {
+  const group = gltf.scene;
+  group.name = 'Hoodie by yogaminggames';
+  group.position.y = -1.36;
+  const bodyMeshes = [];
+  const oldMaterials = new Set();
+  group.traverse(object => {
+    if (!object.isMesh) return;
+    object.castShadow = true;
+    object.receiveShadow = true;
+    bodyMeshes.push(object);
+    for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+      if (material) oldMaterials.add(material);
+    }
+    const replacement = cottonMaterial('body');
+    replacement.name = 'PosterCult cotton';
+    replacement.color.set('#ffffff');
+    object.material = replacement;
+  });
+  for (const material of oldMaterials) {
+    material.map?.dispose();
+    material.dispose();
+  }
+  group.updateMatrixWorld(true);
+  return { group, bodyMeshes };
+}

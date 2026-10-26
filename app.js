@@ -1,6 +1,6 @@
 // Catalogo privato generato da generate_catalog.py: le immagini restano sull'SSD.
 const images = Array.isArray(window.POSTERZ_IMAGES) ? window.POSTERZ_IMAGES : [];
-const productTypes = { poster: 'Poster', originale: 'Immagine originale', tshirt: 'T-shirt 3D' };
+const productTypes = { poster: 'Poster', originale: 'Immagine originale', tshirt: 'T-shirt 3D', cover: 'Cover iPhone 3D' };
 const grid = document.getElementById('product-grid');
 const searchInput = document.getElementById('catalog-search');
 const filmFilter = document.getElementById('film-filter');
@@ -25,6 +25,7 @@ let folderSelection = [];
 let selectedFilm = 'tutti';
 const catalog = window.PosterCatalog;
 let tshirtViewer = null;
+let phoneCaseViewer = null;
 let viewerGeneration = 0;
 
 function disposeTshirtViewer() {
@@ -33,8 +34,17 @@ function disposeTshirtViewer() {
   tshirtViewer = null;
 }
 
+function disposePhoneCaseViewer() {
+  phoneCaseViewer?.dispose();
+  phoneCaseViewer = null;
+}
+
 function tshirtMarkup() {
-  return `<div class="tshirt-viewer" data-state="loading"><div class="tshirt-stage" data-viewer-stage></div><p class="tshirt-status" data-viewer-status role="status" aria-live="polite">Caricamento del modello 3D…</p><fieldset class="tshirt-controls" data-viewer-controls disabled><legend>Controlli del capo 3D</legend><label class="garment-choice">Capo <select data-garment-select aria-label="Seleziona il capo"><option value="tshirt">T-shirt</option><option value="hoodie">Felpa con cappuccio</option></select></label><button type="button" data-view="white" aria-pressed="true">Bianco</button><button type="button" data-view="black" aria-pressed="false">Nero</button><button type="button" data-view="front">Fronte</button><button type="button" data-view="back">Retro</button><button type="button" data-view="in" aria-label="Avvicina">+</button><button type="button" data-view="out" aria-label="Allontana">−</button></fieldset><p class="tshirt-credit">Trascina per ruotare a 360° · rotella o pizzico per zoomare<br>T-shirt boxy: base CC0 di MakeHuman / Elvaerwyn · <a href="https://sketchfab.com/3d-models/premium-eco-hoodie-e1d8b7ad9a0b4f3bba883ec3c02e4f08" target="_blank" rel="noopener">Premium Eco Hoodie</a> di <a href="https://sketchfab.com/lekuns" target="_blank" rel="noopener">lekuns</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>). <a href="docs/tshirt-model.html" target="_blank" rel="noopener">Modello, licenze e limiti</a></p></div>`;
+  return `<div class="tshirt-viewer" data-state="loading"><div class="tshirt-stage" data-viewer-stage></div><p class="tshirt-status" data-viewer-status role="status" aria-live="polite">Caricamento del modello 3D…</p><fieldset class="tshirt-controls" data-viewer-controls disabled><legend>Controlli del capo 3D</legend><label class="garment-choice">Capo <select data-garment-select aria-label="Seleziona il capo"><option value="tshirt">T-shirt</option><option value="hoodie">Premium Eco Hoodie</option><option value="hoodie-alt">Felpa con cappuccio · Yogaminggames</option></select></label><button type="button" data-view="white" aria-pressed="true">Bianco</button><button type="button" data-view="black" aria-pressed="false">Nero</button><button type="button" data-view="front">Fronte</button><button type="button" data-view="back">Retro</button><button type="button" data-view="in" aria-label="Avvicina">+</button><button type="button" data-view="out" aria-label="Allontana">−</button></fieldset><p class="tshirt-credit">Trascina per ruotare a 360° · rotella o pizzico per zoomare<br>T-shirt boxy: base CC0 di MakeHuman / Elvaerwyn · <a href="https://sketchfab.com/3d-models/premium-eco-hoodie-e1d8b7ad9a0b4f3bba883ec3c02e4f08" target="_blank" rel="noopener">Premium Eco Hoodie</a> di <a href="https://sketchfab.com/lekuns" target="_blank" rel="noopener">lekuns</a> · <a href="https://sketchfab.com/3d-models/hoodie-2c674228f1e946b5b8f508f8f818e130" target="_blank" rel="noopener">Hoodie</a> di yogaminggames · CC BY 4.0. <a href="docs/tshirt-model.html" target="_blank" rel="noopener">Modelli, licenze e limiti</a></p></div>`;
+}
+
+function phoneCaseMarkup() {
+  return `<div class="phonecase-viewer" data-state="loading"><div class="phonecase-stage" data-phonecase-stage></div><p class="tshirt-status" data-phonecase-status role="status" aria-live="polite">Caricamento cover 3D…</p><fieldset class="tshirt-controls" data-phonecase-controls disabled><legend>Modello iPhone</legend><label class="garment-choice">Cover per <select data-iphone-model aria-label="Seleziona il modello iPhone"></select></label><button type="button" data-phone-view="back">Retro</button><button type="button" data-phone-view="front">Fronte</button><button type="button" data-phone-view="in" aria-label="Avvicina">+</button><button type="button" data-phone-view="out" aria-label="Allontana">−</button></fieldset><p class="tshirt-credit">Ruota il modello con un trascinamento · zoom con rotella o pizzico. Anteprima indicativa: controlla compatibilità, fotocamere e area stampabile con il produttore della cover.</p></div>`;
 }
 
 async function startTshirtViewer(item) {
@@ -42,7 +52,7 @@ async function startTshirtViewer(item) {
   const host = dialogContent.querySelector('.tshirt-viewer');
   host.querySelector('[data-view="black"]').insertAdjacentHTML('afterend', '<button type="button" data-view="grey" aria-pressed="false">Grigio</button><button type="button" data-view="vintage" aria-pressed="false">Panna vintage</button>');
   try {
-    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=hoodie-premium-2');
+    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=iphone-covers-1');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
     tshirtViewer = mountTshirtViewer(host, item, { editorPanel: dialogContent.querySelector('[data-print-editor]'), compositionPanel: dialogContent.querySelector('[data-compositions]') });
     dialogContent.querySelector('#tshirt-artwork').disabled = false;
@@ -69,6 +79,7 @@ function imageTag(item, full = false, lazy = true) {
 }
 function mockup(item, type, full = false, lazy = true) {
   if (type === 'tshirt') return tshirtMarkup();
+  if (type === 'cover') return phoneCaseMarkup();
   const picture = imageTag(item, full, lazy);
   if (type === 'originale') return `<div class="mockup mockup-original"><div class="original-preview">${picture}</div></div>`;
   if (type === 'poster') return `<div class="mockup mockup-poster"><div class="poster-frame">${picture}</div></div>`;
@@ -157,6 +168,7 @@ function toggleFavorite(id) {
 
 function renderDialog() {
   disposeTshirtViewer();
+  disposePhoneCaseViewer();
   if (!selectedImage) return;
   const item = selectedImage;
   dialogContent.innerHTML = `<div class="dialog-layout"><div class="dialog-preview">${mockup(item, selectedType, true, false)}</div><div class="dialog-info"><span class="section-index">${escapeHtml(item.group)} / ${escapeHtml(item.folder)}</span><h2 id="dialog-title">${escapeHtml(item.film)}</h2><p class="dialog-description">${escapeHtml(item.filename)}<br />${item.width} × ${item.height} pixel · ${escapeHtml(item.filename.split('.').pop().toUpperCase())}</p><p class="dialog-label">VISUALIZZAZIONE DEL POSTER</p><div class="variant-list" role="group" aria-label="Seleziona anteprima">${Object.entries(productTypes).map(([type, label]) => `<button class="variant-button ${selectedType === type ? 'is-selected' : ''}" type="button" data-variant="${type}" aria-pressed="${selectedType === type}">${label}</button>`).join('')}</div><p class="dialog-price">Il file originale è nel tuo archivio.</p><a class="button button-dark original-link" href="${escapeHtml(fileUrl(item.original))}" target="_blank" rel="noopener">Apri il file originale <span aria-hidden="true">↗</span></a><p class="dialog-note">Le anteprime servono a immaginare il risultato: non modificano il file e non sono file pronti per la stampa. Verifica risoluzione e formato con chi stampa.</p></div></div>`;
@@ -164,7 +176,7 @@ function renderDialog() {
 
 function setupTshirtDialog(item) {
   if (selectedType !== 'tshirt') return;
-  dialogContent.querySelector('.dialog-label').textContent = 'T-SHIRT BOXY · PROTOTIPO 3D';
+  dialogContent.querySelector('.dialog-label').textContent = 'CONFIGURATORE CAPI · PROTOTIPO 3D';
   const choices = document.createElement('div');
   choices.className = 'tshirt-catalog';
   choices.innerHTML = `<label for="tshirt-artwork">Grafica dal catalogo</label><select id="tshirt-artwork" disabled>${images.map(image => `<option value="${escapeHtml(image.id)}" ${image.id === item.id ? 'selected' : ''}>${escapeHtml(image.film)} — ${escapeHtml(image.filename)}</option>`).join('')}</select><p class="dialog-note">Scegli il capo e aggiungi le grafiche sul fronte o sul retro. Le anteprime sono indicative: verifica dimensioni e area stampabile con chi stampa.</p>`;
@@ -182,6 +194,28 @@ function setupTshirtDialog(item) {
   </section><section class="compositions" data-compositions aria-label="Composizioni salvate"><label for="composition-name">Composizione su questo dispositivo</label><div class="editor-row"><input id="composition-name" data-composition-name maxlength="120" placeholder="Nome composizione" /><button type="button" data-composition-save>Salva</button></div><div class="editor-row"><select data-composition-list aria-label="Composizioni salvate"><option value="">Nessuna composizione salvata</option></select><button type="button" data-composition-load>Apri</button><button type="button" data-composition-delete>Elimina</button></div></section>`);
   dialogContent.querySelector('.variant-list').after(choices);
   startTshirtViewer(item);
+}
+
+async function setupPhoneCaseDialog(item) {
+  if (selectedType !== 'cover') return;
+  dialogContent.querySelector('.dialog-label').textContent = 'COVER IPHONE · PROTOTIPO 3D';
+  const choices = document.createElement('div');
+  choices.className = 'tshirt-catalog';
+  choices.innerHTML = `<label for="case-artwork">Grafica dal catalogo</label><select id="case-artwork" disabled>${images.map(image => `<option value="${escapeHtml(image.id)}" ${image.id === item.id ? 'selected' : ''}>${escapeHtml(image.film)} — ${escapeHtml(image.filename)}</option>`).join('')}</select><p class="dialog-note">Scegli il modello iPhone e usa la grafica selezionata come anteprima sul retro della cover. La resa reale dipende dal produttore e dalla custodia scelta.</p>`;
+  dialogContent.querySelector('.variant-list').after(choices);
+  const generation = viewerGeneration;
+  const host = dialogContent.querySelector('.phonecase-viewer');
+  try {
+    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=iphone-covers-1');
+    if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
+    phoneCaseViewer = mountPhoneCaseViewer(host, item);
+    dialogContent.querySelector('#case-artwork').disabled = false;
+  } catch {
+    if (generation === viewerGeneration && host.isConnected) {
+      host.dataset.state = 'error';
+      host.querySelector('[data-phonecase-status]').textContent = 'Vista 3D non disponibile. Puoi continuare a usare Poster e Immagine originale.';
+    }
+  }
 }
 
 function openDialog(id) {
@@ -233,7 +267,7 @@ document.getElementById('search-toggle').addEventListener('click', () => {
 });
 document.getElementById('dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-dialog.addEventListener('close', () => { disposeTshirtViewer(); document.body.classList.remove('dialog-open'); selectedImage = null; });
+dialog.addEventListener('close', () => { disposeTshirtViewer(); disposePhoneCaseViewer(); document.body.classList.remove('dialog-open'); selectedImage = null; });
 dialogContent.addEventListener('click', event => {
   const button = event.target.closest('[data-variant]');
   if (!button) return;
@@ -241,9 +275,15 @@ dialogContent.addEventListener('click', event => {
   renderDialog();
   dialogContent.querySelector('.section-index').textContent = [selectedImage.group, ...catalog.folders(selectedImage).map(catalog.label)].join(' / ');
   setupTshirtDialog(selectedImage);
+  setupPhoneCaseDialog(selectedImage);
   dialogContent.querySelector(`[data-variant="${selectedType}"]`).focus();
 });
 dialogContent.addEventListener('change', event => {
+  if (event.target.id === 'case-artwork') {
+    const item = images.find(image => image.id === event.target.value);
+    if (item) phoneCaseViewer?.setArtwork(item);
+    return;
+  }
   if (event.target.id !== 'tshirt-artwork') return;
   const item = images.find(image => image.id === event.target.value);
   if (!item) return;
