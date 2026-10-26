@@ -5,8 +5,9 @@
 .tshirt-status{text-align:center;font-size:12px;line-height:1.5;margin:8px 10px;min-height:36px;color:#35453b}
 .tshirt-viewer[data-state=error] .tshirt-status{color:#853b26}
 .tshirt-controls{border:0;margin:0;padding:4px 8px;display:flex;flex-wrap:wrap;justify-content:center;gap:7px}
-.tshirt-controls button{min-width:42px;min-height:42px;padding:8px 11px;background:#f9f6ee;border:1px solid #b6b9aa;border-radius:4px;color:#26382b;font:12px inherit;cursor:pointer}
+.tshirt-controls button{min-width:42px;min-height:42px;padding:8px 11px;background:#f9f6ee;border:1px solid #b6b9aa;border-radius:4px;color:#26382b;font:inherit;font-size:12px;cursor:pointer}
 .tshirt-controls button[aria-pressed=true]{outline:2px solid #a05b43;outline-offset:1px}
+.tshirt-controls .garment-choice{display:flex;align-items:center;gap:6px;font-size:11px;color:#35453b}.tshirt-controls .garment-choice select{max-width:155px;min-height:42px;padding:7px;background:#f9f6ee;border:1px solid #b6b9aa;border-radius:4px;color:#26382b;font:inherit;font-size:12px}
 .tshirt-controls button:disabled{cursor:wait;opacity:.45}.tshirt-controls legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 .tshirt-credit{text-align:center;font-size:10px;line-height:1.5;margin:8px 0 0}.tshirt-credit a{color:#72533e;text-decoration:underline}
 .tshirt-catalog{margin-top:18px}.tshirt-catalog label{display:block;font-size:12px;margin-bottom:6px}.tshirt-catalog select{max-width:100%;width:100%;background:#f8f5eb;border:1px solid #b6b9aa;padding:12px;font-size:13px}
@@ -16,6 +17,16 @@
 .print-size-presets{display:flex;flex-wrap:wrap;gap:8px}.print-size-presets button{padding:9px 16px;min-height:42px;background:#f8f5eb;border:1px solid #b6b9aa;color:#26382b;cursor:pointer}
 .print-size-presets button[aria-pressed=true]{background:#26382b;color:#fff;border-color:#26382b}.print-size-controls p{font-size:11px;line-height:1.5;color:#626b61;margin:10px 0 0}
 .print-size-controls:disabled{opacity:.5}
-.dialog-preview:has(.tshirt-viewer){height:auto;min-height:580px;align-items:stretch}
-@media(max-width:760px){.dialog-layout:has(.tshirt-viewer){grid-template-columns:1fr}.dialog-preview:has(.tshirt-viewer){height:600px;min-height:600px}.tshirt-viewer{min-height:600px}.tshirt-stage{min-height:340px}}
-@media(max-width:480px){.dialog-preview:has(.tshirt-viewer){height:580px;min-height:580px}.tshirt-viewer{min-height:580px}.tshirt-stage{min-height:290px}}
+.dialog-preview:has(.tshirt-viewer){height:min(80vh,720px);min-height:530px;align-items:stretch;align-self:start;position:sticky;top:0}
+.dialog-preview .tshirt-viewer{min-height:0}.dialog-preview .tshirt-stage{min-height:240px}
+@media(max-width:760px){.dialog-layout:has(.tshirt-viewer){grid-template-columns:1fr}.dialog-preview:has(.tshirt-viewer){height:560px;min-height:560px;position:relative}.dialog-preview .tshirt-stage{min-height:250px}}
+.print-editor,.compositions{border-top:1px solid #c5c7b9;padding:14px 0 0;margin:18px 0 0;display:grid;gap:7px}
+.print-editor[data-disabled=true]{opacity:.55}
+.editor-heading,.editor-row{display:flex;align-items:center;gap:8px}.editor-heading{justify-content:space-between;margin-bottom:5px}.editor-heading strong{font-size:13px}
+.print-editor label,.compositions label{font-size:11px;color:#525b51;margin-top:3px}
+.print-editor input[type=range]{width:100%;min-height:26px;accent-color:#925039;margin:0}
+.print-editor output{float:right;color:#925039;font-variant-numeric:tabular-nums}
+.print-editor select,.compositions select,.compositions input{min-width:0;max-width:100%;width:100%;flex:1;background:#f8f5eb;border:1px solid #b6b9aa;padding:9px;font:inherit;font-size:12px}
+.print-editor button,.compositions button{background:#f8f5eb;border:1px solid #b6b9aa;color:#26382b;padding:8px 10px;min-height:38px;font-size:11px;cursor:pointer}
+.print-editor button:disabled{opacity:.5;cursor:wait}.compositions{gap:8px}.compositions::after{content:"Salvataggio locale: visibile solo in questo browser e dispositivo.";font-size:10px;color:#626b61}
+@media(max-width:760px){.print-editor select,.compositions select,.compositions input,#tshirt-artwork{font-size:16px}.print-editor button,.compositions button{min-height:44px}.print-editor input[type=range]{min-height:36px}}

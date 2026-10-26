@@ -14,22 +14,13 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check published page and versioned assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          base="https://cera1984.github.io/PosterCult"
-          html="$(curl --fail --silent --show-error "$base/")"
-          grep -q 'POSTERCULT' <<<"$html"
-          grep -q 'app.js?v=catalog-restore-1' <<<"$html"
-          grep -q 'catalog-filters.js?v=catalog-restore-1' <<<"$html"
-          grep -q 'tshirt.css?v=catalog-restore-1' <<<"$html"
-          for asset in \
-            'app.js?v=catalog-restore-1' \
-            'catalog-filters.js?v=catalog-restore-1' \
-            'gallery-data.js?v=catalog-restore-1' \
-            'tshirt-viewer.js?v=catalog-restore-1' \
-            'assets/models/boxy-shirt.glb?v=fit-scale-1'; do
-            curl --fail --silent --show-error --output /dev/null "$base/$asset"
-          done
-          echo "Published page and configurator assets are reachable."
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compare published HTML and assets with deployed commit
+        env:
+          EXPECTED_COMMIT: ${{ github.event.workflow_run.head_sha }}
+        run: node scripts/verify-published.mjs

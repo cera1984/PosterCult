@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 
+test.beforeAll(async () => { await mkdir('test-results/previews', { recursive: true }); });
+
 async function openShirt(page) {
   await page.goto('./');
   await page.locator('[data-open]').first().click();
@@ -19,12 +21,12 @@ test('desktop: actual WebGL rendering, colors, orbit, zoom, dynamic artwork, cle
   const stage = page.locator('[data-viewer-stage]');
   await expect(canvas).toBeVisible();
   const front = await canvas.screenshot();
-  await mkdir('docs/screenshots', { recursive: true });
-  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/desktop-white.png' });
+  await mkdir('test-results/previews', { recursive: true });
+  await page.locator('#product-dialog').screenshot({ path: 'test-results/previews/desktop-white.png' });
   await page.getByRole('button', { name: 'Nero', exact: true }).click();
   await expect(host).toHaveAttribute('data-color', 'black');
   expect(Buffer.compare(front, await canvas.screenshot())).not.toBe(0);
-  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/desktop-black.png' });
+  await page.locator('#product-dialog').screenshot({ path: 'test-results/previews/desktop-black.png' });
   const distance = Number(await stage.getAttribute('data-distance'));
   await page.getByRole('button', { name: 'Avvicina', exact: true }).click();
   expect(Number(await stage.getAttribute('data-distance'))).toBeLessThan(distance);
@@ -35,7 +37,7 @@ test('desktop: actual WebGL rendering, colors, orbit, zoom, dynamic artwork, cle
   expect(Math.abs(Number(await stage.getAttribute('data-azimuth')))).toBeGreaterThan(.2);
   await page.getByRole('button', { name: 'Retro', exact: true }).click();
   expect(Math.abs(Number(await stage.getAttribute('data-azimuth')))).toBeCloseTo(Math.PI, 2);
-  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/desktop-back.png' });
+  await page.locator('#product-dialog').screenshot({ path: 'test-results/previews/desktop-back.png' });
   await page.getByRole('button', { name: 'Fronte', exact: true }).click();
   await canvas.focus(); await page.keyboard.press('ArrowRight');
   expect(Math.abs(Number(await stage.getAttribute('data-azimuth')))).toBeGreaterThan(.1);
@@ -46,7 +48,7 @@ test('desktop: actual WebGL rendering, colors, orbit, zoom, dynamic artwork, cle
   await expect(host).toHaveAttribute('data-artwork', nextId);
   expect(nextId).not.toBe(oldId);
   await expect(host).toHaveAttribute('data-state', 'ready');
-  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/desktop-landscape.png' });
+  await page.locator('#product-dialog').screenshot({ path: 'test-results/previews/desktop-landscape.png' });
   await page.getByRole('button', { name: 'Poster', exact: true }).click();
   await expect(page.locator('.dialog-preview .poster-frame img')).toBeVisible();
   await expect(page.locator('.tshirt-stage canvas')).toHaveCount(0);
@@ -80,7 +82,7 @@ test('posters: search, original, favorites, keyboard dialog remain usable withou
 test('mobile viewport: visible controls, canvas, no horizontal overflow', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await openShirt(page);
-  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/mobile.png' });
+  await page.locator('#product-dialog').screenshot({ path: 'test-results/previews/mobile.png' });
   const previewBottom = await page.locator('.dialog-preview').evaluate(el => el.getBoundingClientRect().bottom);
   const controlsBottom = await page.getByRole('button', { name: 'Allontana', exact: true }).evaluate(el => el.getBoundingClientRect().bottom);
   expect(controlsBottom).toBeLessThan(previewBottom);
@@ -177,11 +179,11 @@ test('realism: 2001 artwork at an angle and closer fabric inspection', async ({ 
   await page.locator('.tshirt-stage canvas').focus();
   await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight');
   await page.getByRole('button', { name: 'Bianco', exact: true }).click();
-  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/realism-2001.png' });
+  await page.locator('#product-dialog').screenshot({ path: 'test-results/previews/realism-2001.png' });
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Avvicina', exact: true }).click();
-  await page.locator('.tshirt-stage').screenshot({ path: 'docs/screenshots/realism-closeup.png' });
+  await page.locator('.tshirt-stage').screenshot({ path: 'test-results/previews/realism-closeup.png' });
   await page.getByRole('button', { name: 'Nero', exact: true }).click();
-  await page.locator('.tshirt-stage').screenshot({ path: 'docs/screenshots/realism-closeup-black.png' });
+  await page.locator('.tshirt-stage').screenshot({ path: 'test-results/previews/realism-closeup-black.png' });
   expect(errors).toEqual([]);
 });
 
@@ -203,11 +205,11 @@ test('print size: presets, arbitrary percentage, boundaries and catalog persiste
     await expect(page.getByRole('button', { name: `${percent}%`, exact: true })).toHaveAttribute('aria-pressed', 'true');
   }
   expect(Buffer.compare(initial, await page.locator('canvas').last().screenshot())).not.toBe(0);
-  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/print-200.png' });
+  await page.locator('#product-dialog').screenshot({ path: 'test-results/previews/print-200.png' });
   for (const percent of [275, 25, 300]) {
     await slider.fill(String(percent));
     await expect(host).toHaveAttribute('data-print-scale', String(percent));
-    await expect(page.locator('[data-print-controls] output')).toHaveText(`${percent}%`);
+    await expect(page.locator('[data-out=scale]')).toHaveText(`${percent}%`);
   }
   expect(requests).toEqual([]);
   await page.getByRole('button', { name: '150%', exact: true }).click();
@@ -250,7 +252,7 @@ test('Sopranos original, poster and 3D print use exact published path spelling',
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-state', 'ready');
   await page.getByRole('button', { name: '200%', exact: true }).click();
   await expect(page.locator('.tshirt-viewer')).toHaveAttribute('data-print-scale', '200');
-  await page.locator('#product-dialog').screenshot({ path: 'docs/screenshots/sopranos-path-fixed.png' });
+  await page.locator('#product-dialog').screenshot({ path: 'test-results/previews/sopranos-path-fixed.png' });
 });
 
 test('catalog: existing categories, dependent folders, search counts and reset', async ({ page }) => {
@@ -265,12 +267,12 @@ test('catalog: existing categories, dependent folders, search counts and reset',
   await page.locator('#folder-level-0').selectOption('DARIO ARGENTO');
   expect(await page.locator('[data-open]').count()).toBeLessThan(italianCount);
   await expect(page.locator('#catalog-path')).toContainText('Italiani › Dario Argento');
-  await page.locator('.collection-toolbar').screenshot({ path: 'docs/screenshots/catalog-italiani.png' });
+  await page.locator('.collection-toolbar').screenshot({ path: 'test-results/previews/catalog-italiani.png' });
   await page.locator('#folder-level-0').selectOption('ANTONIONI');
   await page.locator('#folder-level-1').selectOption('BLOW UP');
   await expect(page.locator('#catalog-path')).toContainText('Italiani › Antonioni › Blow Up');
   expect(await page.locator('[data-open]').count()).toBeGreaterThan(0);
-  await page.locator('.collection-toolbar').screenshot({ path: 'docs/screenshots/catalog-nested.png' });
+  await page.locator('.collection-toolbar').screenshot({ path: 'test-results/previews/catalog-nested.png' });
   await page.locator('#category-select').selectOption('Tarantino');
   await expect(page.locator('#catalog-path')).not.toContainText('Dario Argento');
   await expect(page.locator('#folder-level-0')).toHaveValue('');
@@ -289,7 +291,7 @@ test('catalog: existing categories, dependent folders, search counts and reset',
 
 test('restored home, header search, favorites filter and mobile menu', async ({ page }) => {
   await page.goto('./');
-  await page.screenshot({ path: 'docs/screenshots/restored-home.png' });
+  await page.screenshot({ path: 'test-results/previews/restored-home.png' });
   const hero = await page.locator('#hero-front img').evaluate(img => ({ image: img.getBoundingClientRect().width, card: img.parentElement.getBoundingClientRect().width }));
   expect(hero.image).toBeLessThanOrEqual(hero.card + 1);
   await page.locator('#search-toggle').click();
@@ -303,7 +305,7 @@ test('restored home, header search, favorites filter and mobile menu', async ({ 
   await expect(page.locator('#menu-toggle')).toHaveAttribute('aria-expanded', 'true');
   await page.locator('#mobile-nav a').first().click();
   await expect(page.locator('#mobile-nav')).toBeHidden();
-  await page.locator('.collection-toolbar').screenshot({ path: 'docs/screenshots/catalog-mobile.png' });
+  await page.locator('.collection-toolbar').screenshot({ path: 'test-results/previews/catalog-mobile.png' });
   const widths = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
   expect(widths[0]).toBeLessThanOrEqual(widths[1] + 1);
 });
@@ -323,7 +325,7 @@ test('four 3D garment colors preserve artwork, scale and orbit without reloading
     await expect(host).toHaveAttribute('data-print-scale', '150');
     await expect(page.getByRole('button', { name, exact: true })).toHaveAttribute('aria-pressed', 'true');
     screenshots.push(await page.locator('.tshirt-stage canvas').screenshot());
-    if (['grey', 'vintage'].includes(key)) await page.locator('#product-dialog').screenshot({ path: `docs/screenshots/color-${key}.png` });
+    if (['grey', 'vintage'].includes(key)) await page.locator('#product-dialog').screenshot({ path: `test-results/previews/color-${key}.png` });
   }
   expect(new Set(screenshots.map(buffer => buffer.toString('base64'))).size).toBe(4);
   expect(requests).toEqual([]);

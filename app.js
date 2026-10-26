@@ -34,7 +34,7 @@ function disposeTshirtViewer() {
 }
 
 function tshirtMarkup() {
-  return `<div class="tshirt-viewer" data-state="loading"><div class="tshirt-stage" data-viewer-stage></div><p class="tshirt-status" data-viewer-status role="status" aria-live="polite">Caricamento del modello 3D…</p><fieldset class="tshirt-controls" data-viewer-controls disabled><legend>Controlli T-shirt 3D</legend><button type="button" data-view="white" aria-pressed="true">Bianco</button><button type="button" data-view="black" aria-pressed="false">Nero</button><button type="button" data-view="front">Fronte</button><button type="button" data-view="back">Retro</button><button type="button" data-view="in" aria-label="Avvicina">＋</button><button type="button" data-view="out" aria-label="Allontana">−</button></fieldset><p class="tshirt-credit">Trascina per ruotare a 360° · rotella o pizzico per zoomare<br>Base CC0 di Elvaerwyn / MakeHuman, adattata boxy. <a href="docs/tshirt-model.html" target="_blank" rel="noopener">Modello e limiti</a></p></div>`;
+  return `<div class="tshirt-viewer" data-state="loading"><div class="tshirt-stage" data-viewer-stage></div><p class="tshirt-status" data-viewer-status role="status" aria-live="polite">Caricamento del modello 3D…</p><fieldset class="tshirt-controls" data-viewer-controls disabled><legend>Controlli del capo 3D</legend><label class="garment-choice">Capo <select data-garment-select aria-label="Seleziona il capo"><option value="tshirt">T-shirt</option><option value="hoodie">Felpa con cappuccio</option></select></label><button type="button" data-view="white" aria-pressed="true">Bianco</button><button type="button" data-view="black" aria-pressed="false">Nero</button><button type="button" data-view="front">Fronte</button><button type="button" data-view="back">Retro</button><button type="button" data-view="in" aria-label="Avvicina">+</button><button type="button" data-view="out" aria-label="Allontana">−</button></fieldset><p class="tshirt-credit">Trascina per ruotare a 360° · rotella o pizzico per zoomare<br>Base CC0 di Elvaerwyn / MakeHuman, con dettagli hoodie procedurali. <a href="docs/tshirt-model.html" target="_blank" rel="noopener">Modello e limiti</a></p></div>`;
 }
 
 async function startTshirtViewer(item) {
@@ -42,9 +42,9 @@ async function startTshirtViewer(item) {
   const host = dialogContent.querySelector('.tshirt-viewer');
   host.querySelector('[data-view="black"]').insertAdjacentHTML('afterend', '<button type="button" data-view="grey" aria-pressed="false">Grigio</button><button type="button" data-view="vintage" aria-pressed="false">Panna vintage</button>');
   try {
-    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=catalog-restore-1');
+    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=editor-hoodie-2');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
-    tshirtViewer = mountTshirtViewer(host, item, { scalePanel: dialogContent.querySelector('[data-print-controls]') });
+    tshirtViewer = mountTshirtViewer(host, item, { editorPanel: dialogContent.querySelector('[data-print-editor]'), compositionPanel: dialogContent.querySelector('[data-compositions]') });
     dialogContent.querySelector('#tshirt-artwork').disabled = false;
   } catch {
     if (generation === viewerGeneration && host.isConnected) {
@@ -167,8 +167,19 @@ function setupTshirtDialog(item) {
   dialogContent.querySelector('.dialog-label').textContent = 'T-SHIRT BOXY · PROTOTIPO 3D';
   const choices = document.createElement('div');
   choices.className = 'tshirt-catalog';
-  choices.innerHTML = `<label for="tshirt-artwork">Grafica dal catalogo</label><select id="tshirt-artwork" disabled>${images.map(image => `<option value="${escapeHtml(image.id)}" ${image.id === item.id ? 'selected' : ''}>${escapeHtml(image.film)} — ${escapeHtml(image.filename)}</option>`).join('')}</select><p class="dialog-note">Taglio boxy indicativo, stampa frontale a proporzioni conservate. Nessuna simulazione di taglia, tessuto o file di stampa.</p>`;
-  choices.insertAdjacentHTML('beforeend', `<fieldset class="print-size-controls" data-print-controls disabled><legend id="print-size-label">Dimensione grafica <output for="tshirt-print-size" aria-live="polite">100%</output></legend><input id="tshirt-print-size" data-print-range type="range" min="25" max="300" step="5" value="100" aria-labelledby="print-size-label" /><div class="print-size-presets" role="group" aria-label="Percentuali rapide">${[100, 150, 200].map(value => `<button type="button" data-print-scale="${value}" aria-pressed="${value === 100}">${value}%</button>`).join('')}</div><p>Da 25% a 300%. Oltre i bordi del capo, la grafica viene ritagliata.</p></fieldset>`);
+  choices.innerHTML = `<label for="tshirt-artwork">Grafica dal catalogo</label><select id="tshirt-artwork" disabled>${images.map(image => `<option value="${escapeHtml(image.id)}" ${image.id === item.id ? 'selected' : ''}>${escapeHtml(image.film)} — ${escapeHtml(image.filename)}</option>`).join('')}</select><p class="dialog-note">Scegli il capo e aggiungi le grafiche sul fronte o sul retro. Le anteprime sono indicative: verifica dimensioni e area stampabile con chi stampa.</p>`;
+  choices.insertAdjacentHTML('beforeend', `<section class="print-editor" data-print-editor aria-label="Editor grafiche" data-disabled="true">
+    <div class="editor-heading"><strong>Grafiche sul capo</strong><button type="button" data-layer-add>Aggiungi grafica</button></div>
+    <label for="layer-select">Livello selezionato</label><div class="editor-row"><select id="layer-select" data-layer-select></select><button type="button" data-layer-remove aria-label="Rimuovi grafica">Rimuovi</button></div>
+    <label for="layer-side">Lato</label><select id="layer-side" data-layer-side><option value="front">Fronte</option><option value="back">Retro</option></select>
+    <label for="layer-x">Spostamento orizzontale <output data-out="x">0</output></label><input id="layer-x" data-transform="x" type="range" min="-100" max="100" value="0" />
+    <label for="layer-y">Spostamento verticale <output data-out="y">0</output></label><input id="layer-y" data-transform="y" type="range" min="-100" max="100" value="0" />
+    <label for="layer-scale">Dimensione <output data-out="scale">100%</output></label><input id="layer-scale" data-transform="scale" data-print-range type="range" min="25" max="300" step="5" value="100" />
+    <div class="editor-row" role="group" aria-label="Percentuali rapide">${[100, 150, 200].map(value => `<button type="button" data-print-scale="${value}" aria-pressed="${value === 100}">${value}%</button>`).join('')}</div>
+    <label for="layer-rotation">Rotazione <output data-out="rotation">0°</output></label><input id="layer-rotation" data-transform="rotation" type="range" min="-180" max="180" value="0" />
+    <label for="layer-crop">Ritaglio / zoom immagine <output data-out="crop">100%</output></label><input id="layer-crop" data-transform="crop" type="range" min="100" max="300" step="5" value="100" />
+    <div class="editor-row"><button type="button" data-layer-flip>Ribalta orizzontalmente</button></div>
+  </section><section class="compositions" data-compositions aria-label="Composizioni salvate"><label for="composition-name">Composizione su questo dispositivo</label><div class="editor-row"><input id="composition-name" data-composition-name maxlength="120" placeholder="Nome composizione" /><button type="button" data-composition-save>Salva</button></div><div class="editor-row"><select data-composition-list aria-label="Composizioni salvate"><option value="">Nessuna composizione salvata</option></select><button type="button" data-composition-load>Apri</button><button type="button" data-composition-delete>Elimina</button></div></section>`);
   dialogContent.querySelector('.variant-list').after(choices);
   startTshirtViewer(item);
 }
