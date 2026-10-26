@@ -42,7 +42,7 @@ async function startTshirtViewer(item) {
   const host = dialogContent.querySelector('.tshirt-viewer');
   host.querySelector('[data-view="black"]').insertAdjacentHTML('afterend', '<button type="button" data-view="grey" aria-pressed="false">Grigio</button><button type="button" data-view="vintage" aria-pressed="false">Panna vintage</button>');
   try {
-    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=editor-hoodie-2');
+    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=hoodie-premium-2');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
     tshirtViewer = mountTshirtViewer(host, item, { editorPanel: dialogContent.querySelector('[data-print-editor]'), compositionPanel: dialogContent.querySelector('[data-compositions]') });
     dialogContent.querySelector('#tshirt-artwork').disabled = false;
