@@ -64,3 +64,6 @@ Tutte le 15 varianti iPhone 13–17 del selettore ora usano cover cave dedicate 
 
 ## Interfaccia Cinema Club
 Home sfogliabile, categorie rapide, scelta casuale fra i risultati, ordinamento, griglia ampia/compatta e accesso diretto ai configuratori. [Interazioni e verifiche](docs/INTERFACE.md).
+
+## Cinema 3D navigabile
+Entra nell'atrio, scegli una sala per categoria, sfoglia le locandine sul grande schermo e portale al banco vintage con manopole e anteprima 3D. Comandi touch, mouse e tastiera; catalogo sempre disponibile. [Percorso, comandi e limiti](docs/CINEMA.md).

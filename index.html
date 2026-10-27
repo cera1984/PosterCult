@@ -5,24 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#182620" />
     <meta name="description" content="Sfoglia i poster di PosterCult, prova le anteprime e apri le immagini originali." />
-    <title>PosterCult — Archivio di poster</title>
+    <title>PosterCult — Il tuo cinema di culto</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="local.css?v=editor-hoodie-2" />
     <link rel="stylesheet" href="catalog.css?v=editor-hoodie-2" />
     <link rel="stylesheet" href="tshirt.css?v=buttons-audit-1" />
     <link rel="stylesheet" href="experience.css?v=cinema-club-1" />
+    <link rel="stylesheet" href="cinema.css?v=immersive-1" />
     <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js"}}</script>
     <script src="gallery-data.js?v=editor-hoodie-2" defer></script>
     <script src="catalog-filters.js?v=editor-hoodie-2" defer></script>
-    <script src="app.js?v=cinema-club-1" defer></script>
-    <script src="experience.js?v=cinema-club-1" defer></script>
+    <script src="app.js?v=immersive-1" defer></script>
+    <script src="experience.js?v=immersive-1" defer></script>
+    <script src="cinema.js?v=immersive-1" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#collezione">Vai al catalogo</a>
     <div class="announcement">POSTERCULT <span aria-hidden="true">✦</span> IL TUO ARCHIVIO DI CINEMA</div>
     <header class="site-header">
       <a class="brand" href="#inizio" aria-label="PosterCult, torna all'inizio"><span class="brand-symbol" aria-hidden="true">✳</span><span>Poster<span class="brand-break">Cult</span><span class="brand-dot">.</span></span></a>
-      <nav class="desktop-nav" aria-label="Navigazione principale">
+      <nav class="desktop-nav" aria-label="Navigazione principale"><button type="button" class="nav-cinema" data-enter-cinema>Il cinema 3D</button>
         <a href="#collezione">I tuoi poster</a><a href="#manifesto">L'archivio</a><a href="#come-funziona">Come usarlo</a>
       </nav>
       <div class="header-actions">
@@ -35,16 +37,16 @@
         <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Apri menu" aria-expanded="false"><span></span><span></span></button>
       </div>
     </header>
-    <nav class="mobile-nav" id="mobile-nav" aria-label="Navigazione mobile" hidden><a href="#collezione">I tuoi poster</a><a href="#manifesto">L'archivio</a><a href="#come-funziona">Come usarlo</a></nav>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Navigazione mobile" hidden><button type="button" class="mobile-cinema" data-enter-cinema>Entra nel cinema 3D ↗</button><a href="#collezione">I tuoi poster</a><a href="#manifesto">L'archivio</a><a href="#come-funziona">Come usarlo</a></nav>
 
     <main id="inizio">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-grain" aria-hidden="true"></div>
         <div class="hero-copy">
           <div class="eyebrow hero-eyebrow"><span class="little-star">✳</span> CINEMA DA COLLEZIONARE <span class="line"></span> 2026</div>
-          <h1 id="hero-title">Il cinema,<br /><em>fuori</em> dallo<br />schermo<span class="hero-period">.</span></h1>
-          <p>Locandine che meritano un posto fuori dalla sala. Sfoglia l’archivio, ritrova un cult e trasformalo in un poster, una T-shirt o una cover.</p>
-          <div class="hero-ctas"><a href="#collezione" class="button button-light">Esplora l’archivio <span aria-hidden="true">↗</span></a><button type="button" class="button button-ghost" data-surprise>Sorprendimi <span aria-hidden="true">⤨</span></button></div><div class="hero-stats"><div><strong data-archive-count>—</strong><span>immagini da riscoprire</span></div><div><strong data-film-count>—</strong><span>film, infinite storie</span></div><span class="archive-stamp" aria-hidden="true">ARCHIVIO<br>DI CULTO<br>✳</span></div>
+          <h1 id="hero-title">Il tuo<br /><em>cinema</em><br />di culto<span class="hero-period">.</span></h1>
+          <p>Entra nell’atrio, scegli una sala e lascia che siano le locandine a raccontare. Poi passa al banco di stampa: il tuo cult diventa una cover o una T-shirt.</p>
+          <div class="hero-ctas"><button type="button" class="button button-light cinema-entry" data-enter-cinema>Entra nel cinema <span aria-hidden="true">↗</span></button><a href="#collezione" class="button button-ghost">Sfoglia il catalogo <span aria-hidden="true">↗</span></a><button type="button" class="button button-ghost" data-surprise>Sorprendimi <span aria-hidden="true">⤨</span></button></div><div class="hero-stats"><div><strong data-archive-count>—</strong><span>immagini da riscoprire</span></div><div><strong data-film-count>—</strong><span>film, infinite storie</span></div><span class="archive-stamp" aria-hidden="true">ARCHIVIO<br>DI CULTO<br>✳</span></div>
           <div class="hero-footnote"><span class="hero-footnote-dot"></span> ARCHIVIO POSTERCULT <span>·</span> ANTEPRIME INTERATTIVE</div>
         </div>
         <div class="hero-visual" aria-label="Tre immagini dal tuo archivio">
@@ -83,6 +85,20 @@
 
     <footer class="footer"><div class="footer-top"><a class="brand footer-brand" href="#inizio"><span class="brand-symbol" aria-hidden="true">✳</span><span>Poster<span class="brand-break">Cult</span><span class="brand-dot">.</span></span></a><p>Un archivio di poster da esplorare.<br />Anteprime interattive per ogni immagine.</p><a href="#inizio" class="back-to-top">TORNA SU ↑</a></div><div class="footer-bottom"><span>© 2026 POSTERCULT</span><span>ANTEPRIME · CATALOGO · T-SHIRT 3D</span></div></footer>
 
+    <dialog id="cinema-dialog" class="cinema-shell" aria-label="Cinema PosterCult" tabindex="-1">
+      <div class="cinema-world" data-cinema-world></div>
+      <div class="cinema-vignette" aria-hidden="true"></div>
+      <header class="cinema-topbar"><div class="cinema-wordmark">PosterCult<span>.</span><small>UN CINEMA TUTTO TUO</small></div><div class="cinema-top-actions"><button type="button" data-cinema-audio aria-pressed="false">Audio spento</button><button type="button" data-cinema-close>Catalogo ↗</button></div></header>
+      <div class="cinema-location"><span data-cinema-location>ATRIO / PIANO TERRA</span><h2 data-cinema-title>Benvenuto al cinema.</h2><p data-cinema-description>Trascina per guardarti intorno. Usa il comando in basso per camminare, poi tocca una porta.</p></div>
+      <div class="cinema-status" data-cinema-status role="status" aria-live="polite">Prepariamo le luci dell’atrio…</div>
+      <button type="button" class="cinema-rooms-button" data-cinema-rooms>Le sale <span aria-hidden="true">☷</span></button>
+      <div class="cinema-walk" data-cinema-walk><button type="button" class="cinema-joystick" data-cinema-stick aria-label="Trascina per camminare. Frecce o WASD da tastiera."><span aria-hidden="true">✥</span></button><small>MUOVITI</small></div>
+      <div class="cinema-hall-ticket" data-cinema-hall-ticket><span>BIGLIETTO APERTO</span><strong data-cinema-room-count>— sale da esplorare</strong><small>Ogni porta, un altro mondo.</small><button type="button" data-cinema-wing hidden>Altre sale →</button></div>
+      <section class="cinema-projection" data-cinema-projection aria-label="Locandina in proiezione" hidden><div class="projection-controls"><button type="button" data-cinema-prev aria-label="Locandina precedente nella sala">←</button><div><span data-cinema-counter>01 / 01</span><h3 data-cinema-film>In proiezione</h3><p data-cinema-file></p></div><button type="button" data-cinema-next aria-label="Locandina successiva nella sala">→</button></div><label class="cinema-focus">Avvicinati allo schermo <input type="range" data-cinema-focus min="0" max="100" value="0" aria-label="Avvicinati allo schermo"></label><div class="projection-actions"><button type="button" data-cinema-inspect>Guarda da vicino</button><button type="button" data-cinema-create="tshirt">Crea una T-shirt</button><button type="button" data-cinema-create="cover">Crea una cover ↗</button></div></section>
+      <button type="button" class="cinema-back" data-cinema-back hidden>← Torna all’atrio</button>
+      <aside class="cinema-room-menu" data-cinema-room-menu aria-label="Elenco delle sale" hidden><div><span>IL PROGRAMMA DI OGGI</span><button type="button" data-cinema-menu-close aria-label="Chiudi elenco sale">×</button></div><h2>Scegli la tua sala.</h2><div data-cinema-room-list></div></aside>
+      <div class="cinema-fallback" data-cinema-fallback hidden><span>✳</span><h2>Il cinema 3D non è disponibile qui.</h2><p>Puoi comunque scegliere una sala dall’elenco e sfogliare tutte le locandine nel catalogo.</p><button type="button" data-cinema-rooms>Scopri le sale</button></div>
+    </dialog>
     <div id="archive-toast" class="archive-toast" role="status" aria-live="polite" hidden></div>
     <dialog id="product-dialog" class="product-dialog" aria-labelledby="dialog-title"><button type="button" class="dialog-close" id="dialog-close" aria-label="Chiudi anteprima">×</button><div id="dialog-content"></div></dialog>
   </body>

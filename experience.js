@@ -53,7 +53,7 @@
     featuredStep=(featuredStep+direction+3)%3;syncFeature();
   }));syncFeature();
   document.addEventListener('keydown',event=>{
-    if(event.key!=='/'||event.ctrlKey||event.metaKey||event.altKey||document.getElementById('product-dialog').open)return;
+    if(event.key!=='/'||event.ctrlKey||event.metaKey||event.altKey||document.querySelector('dialog[open]'))return;
     if(event.target.closest('input,textarea,select,[contenteditable="true"]'))return;
     event.preventDefault();document.getElementById('search-toggle').click();
   });
