@@ -1,7 +1,7 @@
 # Cover iPhone 16 Pro — ricerca e implementazione, 27 ottobre 2026
 
 ## Risultato e stato
-Il 16 Pro usa ora una cover cava parametrica originale, senza telefono o lenti finte: dorso con foro fotocamere reale, protezione rialzata, fronte aperto e interruzioni dei bordi per tasti, Camera Control e connettori. Grafica dinamica sul dorso con UV planari e ritaglio centrale, rotazione OrbitControls senza limite azimutale, zoom mouse/touch e pulsanti. Il modello iniziale è il 16 Pro. Le altre 14 varianti mantengono l'anteprima precedente indicativa. Poster e T-shirt non sono stati modificati.
+Il 16 Pro usa una cover cava originale generata in GLB (3,15 MB) con sottrazioni CSG, raccordi smussati e superfici continue, senza telefono o lenti finte: dorso con foro fotocamere reale, protezione rialzata, fronte aperto e aperture chiuse da un bordo continuo per tasti, Camera Control, USB-C e speaker. La scocca assemblata con segmenti rettangolari è stata sostituita. Grafica dinamica con UV planari anche sui raccordi esterni e scelta fra Grafica intera (immagine contenuta su fondo chiaro) e Riempi cover (ritaglio centrale), rotazione OrbitControls senza limite azimutale, zoom mouse/touch e pulsanti. Il modello iniziale è il 16 Pro. Le altre 14 varianti mantengono l'anteprima precedente indicativa. Poster e T-shirt non sono stati modificati.
 
 **Non è stato acquisito né validato un modello esterno preciso con licenza commerciale.** L'implementazione è un miglioramento verificabile del prototipo, non soddisfa ancora il requisito di una cover industriale verificata. Non dichiarare compatibilità fisica o certificazione Apple.
 
@@ -14,10 +14,10 @@ Il 16 Pro usa ora una cover cava parametrica originale, senza telefono o lenti f
 - Victronix, Printables 1012139: indicizzato come uso privato. Escluso in assenza di licenza commerciale verificata.
 
 ## Quote e limiti
-Il codice separa le misure nominali Apple dalle scelte di anteprima. Gioco 0,3 mm, parete/dorso 1,5 mm, raccordo circolare 12 mm, apertura camera 40 × 42 mm con centro (-14,52) mm sono **scelte progettuali non validate**. Gli angoli reali Apple non sono semplici archi circolari. Le aperture laterali sono conservative e semplificate; non riproducono quote complete di tasti, speaker o USB-C. Protezione camera e ritenzione non sono validate; il fronte non ha un labbro di aggancio. Nessuna verifica MagSafe, RF, materiali o produzione. Il dorso non stampa sui bordi; la grafica viene tagliata in corrispondenza del foro camera. Nessuna mesh esterna GLB/STL viene spacciata per verificata.
+Il codice separa le misure nominali Apple dalle scelte di anteprima. Gioco 0,3 mm, parete/dorso 1,5 mm, raccordo circolare 12 mm, apertura camera 40 × 42 mm con centro (-14,52) mm sono **scelte progettuali non validate**. Gli angoli reali Apple non sono semplici archi circolari. Le aperture laterali e inferiori sono ora fori CSG con bordi raccordati, ma le loro posizioni restano scelte progettuali semplificate: non riproducono tutte le quote Apple dei tasti, speaker o USB-C. Protezione camera e ritenzione non sono validate; il fronte non ha un labbro di aggancio. Nessuna verifica MagSafe, RF, materiali o produzione. La proiezione planare avvolge i raccordi, ma sui fianchi quasi perpendicolari può allungare i pixel; non è una simulazione UV di un processo di stampa industriale; la grafica viene tagliata in corrispondenza del foro camera. Nessuna mesh esterna GLB/STL viene spacciata per verificata.
 
 ## Licenza
-`iphone-16-pro-geometry.js` è codice originale di questo intervento, distribuito sotto MIT (vedi `LICENSE-IPHONE-GEOMETRY.txt`), utilizzabile e modificabile anche commercialmente. La licenza copre solo quel codice, non i disegni Apple, marchi, modelli di terzi o grafiche del catalogo. Non è una verifica legale completa del prodotto.
+`iphone-16-pro-geometry.js`, `scripts/build-phone-case.mjs` e `assets/models/iphone-16-pro-shell.glb` sono risorse originali di questo intervento, distribuito sotto MIT (vedi `LICENSE-IPHONE-GEOMETRY.txt`), utilizzabile e modificabile anche commercialmente. La licenza copre solo questi sorgenti e il GLB generato, non i disegni Apple, marchi, modelli di terzi o grafiche del catalogo. Non è una verifica legale completa del prodotto.
 
 ## Verifica e prossimi passi
 Test unitari: dimensioni nominali, bounding box della cover, coordinate finite, raggi che attraversano il foro camera senza incontrare triangoli e dorso presente. Test browser: selezione 16 Pro, grafica, rotazione, zoom, smontaggio tornando a Poster. La suite esistente copre catalogo e T-shirt/felpe.
@@ -27,3 +27,8 @@ Prima di estendere: acquisire il file originale di un candidato con testo comple
 Comandi riproducibili: `npm test`; `npx playwright test --config=playwright.software.config.js --reporter=line`. La configurazione software aumenta solo timeout e attese, conserva porta, scenari e controlli della suite standard.
 
 Esito finale: 11/11 test unitari e 24/24 test browser passati (suite software, circa 2 minuti). Verificate visivamente le schermate del dorso e dell'interno. Il primo tentativo standard ha incontrato timeout di 5 secondi sul caricamento T-shirt; una prova su porta alternativa non poteva eseguire lo scenario con URL fisso. La suite finale usa la porta standard e attese maggiori, senza saltare test.
+
+## Ricostruzione e controllo del GLB
+Eseguire `npm ci` e `node scripts/build-phone-case.mjs`. Three-bvh-csg e three-mesh-bvh (MIT) sono dipendenze di sviluppo; il browser carica solo il GLB generato con GLTFLoader. Materiali separati per esterno stampato e superficie interna; nessuna immagine di fotocamere sovrapposta. Validatore Khronos: 0 errori, 0 warning, 2 informazioni sulle UV che saranno utilizzate dalla grafica dinamica a runtime. Il modello rimane una visualizzazione originale, non un CAD di produzione.
+
+Verifica della scocca GLB v2: 11 test unitari e 24 browser passati; controllate visivamente apertura iniziale, grafica intera/riempita, vista inclinata e interno. Cache aggiornata su entry app, viewer, geometria e asset GLB. Il link di rilascio usa anche una query sulla pagina per richiedere HTML aggiornato.

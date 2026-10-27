@@ -7,6 +7,11 @@ test('16 Pro camera opening, dynamic print, orbit, zoom and return to poster', a
   await expect(host).toHaveAttribute('data-state','ready');
   await expect(host).toHaveAttribute('data-device-model','iPhone 16 Pro');
   await expect(host).toHaveAttribute('data-geometry','parametric-16-pro');
+  await page.locator('#product-dialog').screenshot({path:'test-results/iphone-16-pro-initial.png'});
+  await host.locator('[data-phone-view="fit"]').click();
+  await expect(host).toHaveAttribute('data-artwork-fit','contain');
+  await host.locator('[data-phone-view="fill"]').click();
+  await expect(host).toHaveAttribute('data-artwork-fit','cover');
   const before=await stage.getAttribute('data-distance');
   await host.locator('[data-phone-view="in"]').click();
   expect(Number(await stage.getAttribute('data-distance'))).toBeLessThan(Number(before));

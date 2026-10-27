@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+import { GLTFLoader } from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
-import { createIphone16ProCase } from './iphone-16-pro-geometry.js';
+import { createIphone16ProCase } from './iphone-16-pro-geometry.js?v=shell-2';
 import { RoomEnvironment } from './vendor/three/examples/jsm/environments/RoomEnvironment.js';
 
 const devices = [
@@ -87,9 +88,10 @@ export function mountPhoneCaseViewer(host, initialItem) {
   const select = host.querySelector('[data-iphone-model]');
   select.replaceChildren(...devices.map(device => new Option(device.name, device.name)));
   select.value = 'iPhone 16 Pro';
+  let caseData, fitMode = "cover";
   let disposed = false, renderer, controls, observer, artwork, request = 0, currentModel, environmentTarget, ground, groundTexture, facing = false;
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#e5e4da');
+  scene.background = new THREE.Color('#eeede8');
   const camera = new THREE.PerspectiveCamera(34, 1, .01, 30);
   camera.position.set(.15, .22, 3.15);
   const target = new THREE.Vector3(0, 0, 0);
@@ -97,8 +99,16 @@ export function mountPhoneCaseViewer(host, initialItem) {
   const render = () => { if (!disposed && renderer) { renderer.render(scene, camera); stage.dataset.azimuth = controls?.getAzimuthalAngle().toFixed(3); stage.dataset.distance = camera.position.distanceTo(target).toFixed(3); } };
   const updateArtwork = () => {
     if (!currentModel?.print || !artwork) return;
-    const texture = new THREE.Texture(artwork.image);
-    fitArtwork(texture, currentModel.print.userData.aspect);
+    const aspect=currentModel.print.userData.aspect;
+    let texture;
+    if(fitMode==='contain') {
+      const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=Math.round(1024/aspect);
+      const ctx=canvas.getContext('2d');ctx.fillStyle='#f2eee6';ctx.fillRect(0,0,canvas.width,canvas.height);
+      const image=artwork.image,scale=Math.min(canvas.width/image.width,canvas.height/image.height);
+      const w=image.width*scale,h=image.height*scale;ctx.drawImage(image,(canvas.width-w)/2,(canvas.height-h)/2,w,h);
+      texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+    } else { texture=new THREE.Texture(artwork.image);fitArtwork(texture,aspect); }
+    texture.anisotropy=renderer?.capabilities.getMaxAnisotropy() || 1;
     const previous = currentModel.print.material.map;
     currentModel.print.material.map = texture; currentModel.print.material.needsUpdate = true;
     previous?.dispose(); render();
@@ -109,10 +119,10 @@ export function mountPhoneCaseViewer(host, initialItem) {
       currentModel.group.traverse(object => { object.geometry?.dispose(); if (object.material) { const materials = Array.isArray(object.material) ? object.material : [object.material]; for (const material of materials) { material.map?.dispose(); material.dispose(); } } });
     }
     if (device.name === 'iPhone 16 Pro') {
-      currentModel = createIphone16ProCase(); scene.add(currentModel.group);
+      currentModel = createIphone16ProCase(caseData); scene.add(currentModel.group);
       if (ground) { ground.position.set(0,-.85,-.015); }
       host.dataset.deviceModel = device.name; host.dataset.geometry = 'parametric-16-pro';
-      camera.position.set(.34,.16,2.85); controls?.target.copy(target); controls?.update();
+      camera.position.set(.85,.36,3.55); controls?.target.copy(target); controls?.update();
       if (artwork) updateArtwork(); render(); return;
     }
     host.dataset.geometry = 'indicative';
@@ -153,11 +163,17 @@ export function mountPhoneCaseViewer(host, initialItem) {
   };
   const onModelChange = () => {
     const device = devices.find(entry => entry.name === select.value);
-    if (device) { setModel(device); setStatus(`${device.name} · ${device.name === "iPhone 16 Pro" ? "cover parametrica · quote base Apple; aperture da validare" : "anteprima cover 3D indicativa"}`); }
+    if (device) { setModel(device); setStatus(`${device.name} · ${device.name === "iPhone 16 Pro" ? "cover vuota · stampa sul dorso" : "anteprima cover 3D indicativa"}`); }
   };
   const onAction = event => {
     const button = event.target.closest('[data-phone-view]');
     if (!button || !controls) return;
+    if (['fit','fill'].includes(button.dataset.phoneView)) {
+      fitMode=button.dataset.phoneView==='fit'?'contain':'cover';updateArtwork();
+      host.dataset.artworkFit=fitMode;
+      host.querySelectorAll('[data-phone-view="fit"],[data-phone-view="fill"]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+      return;
+    }
     if (button.dataset.phoneView === 'front' || button.dataset.phoneView === 'back') {
       facing = button.dataset.phoneView === 'front';
       const distance = camera.position.distanceTo(controls.target);
@@ -180,7 +196,7 @@ export function mountPhoneCaseViewer(host, initialItem) {
       try { updateArtwork(); }
       catch (error) { artwork = previous; next.dispose(); throw error; }
       previous?.dispose();
-      host.dataset.artwork = item.id; setStatus(`${select.value} · ${select.value === "iPhone 16 Pro" ? "cover parametrica · quote base Apple; aperture da validare" : "anteprima cover 3D indicativa"}`);
+      host.dataset.artwork = item.id; setStatus(`${select.value} · ${select.value === "iPhone 16 Pro" ? "cover vuota · stampa sul dorso" : "anteprima cover 3D indicativa"}`);
     } catch (error) {
       if (disposed || currentRequest !== request) return;
       setStatus('Immagine non caricata. Riprova o scegli un’altra grafica.'); console.warn('PosterCult cover artwork:', error);
@@ -190,15 +206,18 @@ export function mountPhoneCaseViewer(host, initialItem) {
     if (disposed) return;
     disposed = true; ++request;
     select.removeEventListener('change', onModelChange); host.removeEventListener('click', onAction);
-    observer?.disconnect(); controls?.dispose(); artwork?.dispose(); environmentTarget?.dispose(); groundTexture?.dispose();
+    observer?.disconnect(); caseData?.traverse(node=>{node.geometry?.dispose();node.material?.dispose();}); controls?.dispose(); artwork?.dispose(); environmentTarget?.dispose(); groundTexture?.dispose();
     scene.traverse(object => { object.geometry?.dispose(); if (object.material) { const materials = Array.isArray(object.material) ? object.material : [object.material]; for (const material of materials) { material.map?.dispose(); material.dispose(); } } });
     scene.clear(); renderer?.dispose(); renderer?.forceContextLoss(); renderer?.domElement.remove();
   };
   (async () => {
     try {
+      const asset = await new GLTFLoader().loadAsync(new URL('./assets/models/iphone-16-pro-shell.glb?v=shell-2',import.meta.url).href);
+      caseData = asset.scene;
+      if (disposed) { caseData.traverse(node=>{node.geometry?.dispose();node.material?.dispose();}); return; }
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
       renderer.shadowMap.enabled = false;
       stage.append(renderer.domElement); renderer.domElement.tabIndex = 0; renderer.domElement.setAttribute('role', 'img'); renderer.domElement.setAttribute('aria-label', 'Anteprima interattiva di una cover iPhone. Trascina per ruotare.');
       controls = new OrbitControls(camera, renderer.domElement); controls.enablePan = false; controls.enableDamping = false; controls.minDistance = 1.9; controls.maxDistance = 6; controls.addEventListener('change', render);
