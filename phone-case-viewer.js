@@ -13,7 +13,7 @@ export function mountPhoneCaseViewer(host, initialItem, { editor } = {}) {
   select.replaceChildren(...devices.map(device => new Option(device.name, device.name)));
   select.value = 'iPhone 16 Pro';
   let fitMode = "cover", artworkFrame, modelRequest = 0;
-  const transform = { scale: 100, x: 0, y: 0 };
+  const transform = { scale: 100, x: 0, y: 0, rotation: 0 };
   let disposed = false, renderer, controls, observer, artwork, request = 0, currentModel, environmentTarget, ground, groundTexture, facing = false;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#eeede8');
@@ -35,7 +35,7 @@ export function mountPhoneCaseViewer(host, initialItem, { editor } = {}) {
     const fit=fitMode==='contain'?Math.min:Math.max;
     const scale=fit(canvas.width/image.width,canvas.height/image.height)*transform.scale/100;
     const w=image.width*scale,h=image.height*scale;
-    ctx.drawImage(image,(canvas.width-w)/2+canvas.width*transform.x/100,(canvas.height-h)/2-canvas.height*transform.y/100,w,h);
+    ctx.save();ctx.translate(canvas.width/2+canvas.width*transform.x/100,canvas.height/2-canvas.height*transform.y/100);ctx.rotate(transform.rotation*Math.PI/180);ctx.drawImage(image,-w/2,-h/2,w,h);ctx.restore();
     texture.colorSpace=THREE.SRGBColorSpace;
     texture.anisotropy=renderer?.capabilities.getMaxAnisotropy() || 1;
     texture.needsUpdate=true;
@@ -47,7 +47,7 @@ export function mountPhoneCaseViewer(host, initialItem, { editor } = {}) {
     if(!editor) return;
     for(const [key,value] of Object.entries(transform)) {
       editor.querySelector('[data-cover-transform="'+key+'"]').value=String(value);
-      editor.querySelector('[data-cover-out="'+key+'"]').textContent=value+'%';
+      editor.querySelector('[data-cover-out="'+key+'"]').textContent=value+(key==='rotation'?'°':'%');
     }
   };
   const onTransform = event => {
@@ -55,14 +55,17 @@ export function mountPhoneCaseViewer(host, initialItem, { editor } = {}) {
     if(!Object.hasOwn(transform,key)) return;
     const value=Number(event.target.value);
     if(!Number.isFinite(value)) return;
-    transform[key]=THREE.MathUtils.clamp(value,key==='scale'?25:-100,key==='scale'?300:100);
+    transform[key]=THREE.MathUtils.clamp(value,key==='scale'?25:key==='rotation'?-180:-100,key==='scale'?300:key==='rotation'?180:100);
     syncEditor();
     cancelAnimationFrame(artworkFrame);
     artworkFrame=requestAnimationFrame(()=>{if(!disposed)updateArtwork();});
   };
   const onReset = event => {
-    if(!event.target.closest('[data-cover-reset]')) return;
-    Object.assign(transform,{scale:100,x:0,y:0});syncEditor();updateArtwork();
+    const axis=event.target.closest('[data-cover-zero]')?.dataset.coverZero;
+    if(axis==='x'||axis==='y') transform[axis]=0;
+    else if(event.target.closest('[data-cover-reset]')) Object.assign(transform,{scale:100,x:0,y:0,rotation:0});
+    else return;
+    cancelAnimationFrame(artworkFrame);syncEditor();updateArtwork();
   };
   editor?.addEventListener('input',onTransform);
   editor?.addEventListener('click',onReset);

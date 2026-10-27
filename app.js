@@ -53,7 +53,7 @@ async function startTshirtViewer(item) {
   const host = dialogContent.querySelector('.tshirt-viewer');
   host.querySelector('[data-view="black"]').insertAdjacentHTML('afterend', '<button type="button" data-view="grey" aria-pressed="false">Grigio</button><button type="button" data-view="vintage" aria-pressed="false">Panna vintage</button>');
   try {
-    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=iphone-covers-1');
+    const { mountTshirtViewer } = await import('./tshirt-viewer.js?v=rotation-1');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
     tshirtViewer = mountTshirtViewer(host, item, { editorPanel: dialogContent.querySelector('[data-print-editor]'), compositionPanel: dialogContent.querySelector('[data-compositions]') });
     dialogContent.querySelector('#tshirt-artwork').disabled = false;
@@ -192,8 +192,8 @@ function setupTshirtDialog(item) {
     <div class="editor-heading"><strong>Grafiche sul capo</strong><button type="button" data-layer-add>Aggiungi grafica</button></div>
     <label for="layer-select">Livello selezionato</label><div class="editor-row"><select id="layer-select" data-layer-select></select><button type="button" data-layer-remove aria-label="Rimuovi grafica">Rimuovi</button></div>
     <label for="layer-side">Lato</label><select id="layer-side" data-layer-side><option value="front">Fronte</option><option value="back">Retro</option></select>
-    <label for="layer-x">Spostamento orizzontale <output data-out="x">0</output></label><input id="layer-x" data-transform="x" type="range" min="-100" max="100" value="0" />
-    <label for="layer-y">Spostamento verticale <output data-out="y">0</output></label><input id="layer-y" data-transform="y" type="range" min="-100" max="100" value="0" />
+    <label for="layer-x">Spostamento orizzontale <output data-out="x">0</output></label><button type="button" class="axis-zero" data-layer-zero="x" aria-label="Azzera spostamento orizzontale">0</button><input id="layer-x" data-transform="x" type="range" min="-100" max="100" value="0" />
+    <label for="layer-y">Spostamento verticale <output data-out="y">0</output></label><button type="button" class="axis-zero" data-layer-zero="y" aria-label="Azzera spostamento verticale">0</button><input id="layer-y" data-transform="y" type="range" min="-100" max="100" value="0" />
     <label for="layer-scale">Dimensione <output data-out="scale">100%</output></label><input id="layer-scale" data-transform="scale" data-print-range type="range" min="25" max="300" step="5" value="100" />
     <div class="editor-row" role="group" aria-label="Percentuali rapide">${[100, 150, 200].map(value => `<button type="button" data-print-scale="${value}" aria-pressed="${value === 100}">${value}%</button>`).join('')}</div>
     <label for="layer-rotation">Rotazione <output data-out="rotation">0°</output></label><input id="layer-rotation" data-transform="rotation" type="range" min="-180" max="180" value="0" />
@@ -210,12 +210,12 @@ async function setupPhoneCaseDialog(item) {
   const choices = document.createElement('div');
   choices.className = 'tshirt-catalog';
   choices.innerHTML = `<label for="case-artwork">Grafica dal catalogo</label><select id="case-artwork" disabled>${images.map(image => `<option value="${escapeHtml(image.id)}" ${image.id === item.id ? 'selected' : ''}>${escapeHtml(image.film)} — ${escapeHtml(image.filename)}</option>`).join('')}</select><p class="dialog-note">Scegli il modello iPhone e usa la grafica selezionata come anteprima sul retro della cover. La resa reale dipende dal produttore e dalla custodia scelta.</p>`;
-  choices.insertAdjacentHTML('beforeend', '<fieldset class="print-editor cover-editor" data-cover-editor disabled><legend>Posizione e dimensione</legend><label for="cover-scale">Dimensione <output data-cover-out="scale">100%</output></label><input id="cover-scale" data-cover-transform="scale" type="range" min="25" max="300" step="1" value="100"><label for="cover-x">Posizione orizzontale <output data-cover-out="x">0%</output></label><input id="cover-x" data-cover-transform="x" type="range" min="-100" max="100" value="0"><label for="cover-y">Posizione verticale <output data-cover-out="y">0%</output></label><input id="cover-y" data-cover-transform="y" type="range" min="-100" max="100" value="0"><button type="button" data-cover-reset>Ripristina grafica</button></fieldset>');
+  choices.insertAdjacentHTML('beforeend', '<fieldset class="print-editor cover-editor" data-cover-editor disabled><legend>Posizione, dimensione e rotazione</legend><label for="cover-scale">Dimensione <output data-cover-out="scale">100%</output></label><input id="cover-scale" data-cover-transform="scale" type="range" min="25" max="300" step="1" value="100"><label for="cover-x">Posizione orizzontale <output data-cover-out="x">0%</output></label><button type="button" class="axis-zero" data-cover-zero="x" aria-label="Azzera spostamento orizzontale">0</button><input id="cover-x" data-cover-transform="x" type="range" min="-100" max="100" value="0"><label for="cover-y">Posizione verticale <output data-cover-out="y">0%</output></label><button type="button" class="axis-zero" data-cover-zero="y" aria-label="Azzera spostamento verticale">0</button><input id="cover-y" data-cover-transform="y" type="range" min="-100" max="100" value="0"><label for="cover-rotation">Rotazione <output data-cover-out="rotation">0°</output></label><input id="cover-rotation" data-cover-transform="rotation" type="range" min="-180" max="180" value="0"><button type="button" data-cover-reset>Ripristina grafica</button></fieldset>');
   dialogContent.querySelector('.variant-list').after(choices);
   const generation = viewerGeneration;
   const host = dialogContent.querySelector('.phonecase-viewer');
   try {
-    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=buttons-audit-1');
+    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=rotation-1');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
     phoneCaseViewer = mountPhoneCaseViewer(host, item, { editor: choices.querySelector('[data-cover-editor]') });
     dialogContent.querySelector('#case-artwork').disabled = false;

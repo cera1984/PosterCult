@@ -36,3 +36,5 @@
 @media(max-width:760px){.print-editor select,.compositions select,.compositions input,#tshirt-artwork{font-size:16px}.print-editor button,.compositions button{min-height:44px}.print-editor input[type=range]{min-height:36px}}
 
 .cover-editor{border-right:0;border-left:0;border-bottom:0;min-width:0;padding:14px 0 0}.cover-editor legend{font-size:12px}.cover-editor:disabled{opacity:.55}
+
+.print-editor .axis-zero{justify-self:end;width:32px;min-height:28px;padding:2px;font:12px var(--mono);border-radius:50%;margin-top:-30px;transform:translateY(-1px)}.print-editor label:has(+.axis-zero){padding-right:40px}.print-editor .axis-zero:hover{background:#d8c59d}.print-editor .axis-zero:focus-visible{outline:2px solid #925039;outline-offset:3px}

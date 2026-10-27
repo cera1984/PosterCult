@@ -9,15 +9,15 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="local.css?v=editor-hoodie-2" />
     <link rel="stylesheet" href="catalog.css?v=editor-hoodie-2" />
-    <link rel="stylesheet" href="tshirt.css?v=buttons-audit-1" />
+    <link rel="stylesheet" href="tshirt.css?v=rotation-1" />
     <link rel="stylesheet" href="experience.css?v=cinema-club-1" />
-    <link rel="stylesheet" href="cinema.css?v=immersive-1" />
+    <link rel="stylesheet" href="cinema.css?v=rotation-recommendations-1" />
     <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js"}}</script>
     <script src="gallery-data.js?v=editor-hoodie-2" defer></script>
     <script src="catalog-filters.js?v=editor-hoodie-2" defer></script>
-    <script src="app.js?v=immersive-1" defer></script>
+    <script src="app.js?v=rotation-recommendations-1" defer></script>
     <script src="experience.js?v=immersive-1" defer></script>
-    <script src="cinema.js?v=immersive-1" defer></script>
+    <script src="cinema.js?v=rotation-recommendations-1" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#collezione">Vai al catalogo</a>
@@ -93,11 +93,11 @@
       <div class="cinema-status" data-cinema-status role="status" aria-live="polite">Prepariamo le luci dell’atrio…</div>
       <button type="button" class="cinema-rooms-button" data-cinema-rooms>Le sale <span aria-hidden="true">☷</span></button>
       <div class="cinema-walk" data-cinema-walk><button type="button" class="cinema-joystick" data-cinema-stick aria-label="Trascina per camminare. Frecce o WASD da tastiera."><span aria-hidden="true">✥</span></button><small>MUOVITI</small></div>
-      <div class="cinema-hall-ticket" data-cinema-hall-ticket><span>BIGLIETTO APERTO</span><strong data-cinema-room-count>— sale da esplorare</strong><small>Ogni porta, un altro mondo.</small><button type="button" data-cinema-wing hidden>Altre sale →</button></div>
-      <section class="cinema-projection" data-cinema-projection aria-label="Locandina in proiezione" hidden><div class="projection-controls"><button type="button" data-cinema-prev aria-label="Locandina precedente nella sala">←</button><div><span data-cinema-counter>01 / 01</span><h3 data-cinema-film>In proiezione</h3><p data-cinema-file></p></div><button type="button" data-cinema-next aria-label="Locandina successiva nella sala">→</button></div><label class="cinema-focus">Avvicinati allo schermo <input type="range" data-cinema-focus min="0" max="100" value="0" aria-label="Avvicinati allo schermo"></label><div class="projection-actions"><button type="button" data-cinema-inspect>Guarda da vicino</button><button type="button" data-cinema-create="tshirt">Crea una T-shirt</button><button type="button" data-cinema-create="cover">Crea una cover ↗</button></div></section>
+      <div class="cinema-hall-ticket" data-cinema-hall-ticket><span>BIGLIETTO APERTO</span><strong data-cinema-room-count>— sale da esplorare</strong><small>Ogni porta, un altro mondo.</small><button type="button" data-cinema-random>Consigliami un film ✦</button><button type="button" data-cinema-wing hidden>Altre sale →</button></div>
+      <section class="cinema-projection" data-cinema-projection aria-label="Locandina in proiezione" hidden><div class="projection-controls"><button type="button" data-cinema-prev aria-label="Locandina precedente nella sala">←</button><div><span data-cinema-counter>01 / 01</span><h3 data-cinema-film>In proiezione</h3><p data-cinema-file></p></div><button type="button" data-cinema-next aria-label="Locandina successiva nella sala">→</button></div><label class="cinema-focus">Avvicinati allo schermo <input type="range" data-cinema-focus min="0" max="100" value="0" aria-label="Avvicinati allo schermo"></label><div class="projection-actions"><button type="button" data-cinema-random>Film a sorpresa ✦</button><button type="button" data-cinema-inspect>Guarda da vicino</button><button type="button" data-cinema-create="tshirt">Crea una T-shirt</button><button type="button" data-cinema-create="cover">Crea una cover ↗</button></div></section>
       <button type="button" class="cinema-back" data-cinema-back hidden>← Torna all’atrio</button>
-      <aside class="cinema-room-menu" data-cinema-room-menu aria-label="Elenco delle sale" hidden><div><span>IL PROGRAMMA DI OGGI</span><button type="button" data-cinema-menu-close aria-label="Chiudi elenco sale">×</button></div><h2>Scegli la tua sala.</h2><div data-cinema-room-list></div></aside>
-      <div class="cinema-fallback" data-cinema-fallback hidden><span>✳</span><h2>Il cinema 3D non è disponibile qui.</h2><p>Puoi comunque scegliere una sala dall’elenco e sfogliare tutte le locandine nel catalogo.</p><button type="button" data-cinema-rooms>Scopri le sale</button></div>
+      <aside class="cinema-recommendation" data-cinema-recommendation aria-labelledby="cinema-recommendation-title" hidden><button type="button" data-recommendation-close aria-label="Chiudi consiglio">×</button><span class="recommendation-kicker">IL CONSIGLIO DEL PROIEZIONISTA / SENZA SPOILER</span><h2 id="cinema-recommendation-title" tabindex="-1"></h2><p data-recommendation-meta></p><ol data-recommendation-tips></ol><small data-recommendation-coverage></small><div class="recommendation-actions"><button type="button" data-recommendation-close>Torna al cinema</button><button type="button" data-cinema-random>Un altro film ↗</button></div></aside><aside class="cinema-room-menu" data-cinema-room-menu aria-label="Elenco delle sale" hidden><div><span>IL PROGRAMMA DI OGGI</span><button type="button" data-cinema-menu-close aria-label="Chiudi elenco sale">×</button></div><h2>Scegli la tua sala.</h2><div data-cinema-room-list></div></aside>
+      <div class="cinema-fallback" data-cinema-fallback hidden><span>✳</span><h2>Il cinema 3D non è disponibile qui.</h2><p>Puoi comunque scegliere una sala dall’elenco e sfogliare tutte le locandine nel catalogo.</p><button type="button" data-cinema-rooms>Scopri le sale</button><button type="button" data-cinema-random>Consigliami un film ✦</button></div>
     </dialog>
     <div id="archive-toast" class="archive-toast" role="status" aria-live="polite" hidden></div>
     <dialog id="product-dialog" class="product-dialog" aria-labelledby="dialog-title"><button type="button" class="dialog-close" id="dialog-close" aria-label="Chiudi anteprima">×</button><div id="dialog-content"></div></dialog>

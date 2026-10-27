@@ -186,7 +186,7 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
     select.disabled = !editorReady || !layer;
     editorPanel.querySelector('[data-layer-add]').disabled = !editorReady;
     editorPanel.dataset.disabled = String(!editorReady || !layer);
-    editorPanel.querySelectorAll('[data-transform], [data-layer-side], [data-layer-flip], [data-layer-remove], [data-print-scale]').forEach(el => { el.disabled = !editorReady || !layer; });
+    editorPanel.querySelectorAll('[data-transform], [data-layer-side], [data-layer-flip], [data-layer-remove], [data-layer-zero], [data-print-scale]').forEach(el => { el.disabled = !editorReady || !layer; });
     if (!layer) return;
     const catalogSelect = host.closest('#dialog-content')?.querySelector('#tshirt-artwork');
     if (catalogSelect) catalogSelect.value = (layer.pendingItem || layer.item).id;
@@ -295,6 +295,7 @@ export function mountTshirtViewer(host, initialItem, { editorPanel, compositionP
   }
   function onEditorClick(event) {
     const button = event.target.closest('button'); if (!button || !editorReady) return;
+    if (button.matches('[data-layer-zero]')) { const layer=selected(),axis=button.dataset.layerZero; if(layer && (axis==='x'||axis==='y')) { layer[axis]=0;syncLayerSelect();updateLayer(layer); } return; }
     if (button.matches('[data-layer-add]')) { addLayer(pendingItem); return; }
     if (button.matches('[data-layer-remove]')) { removeLayer(selectedLayer); return; }
     if (button.matches('[data-layer-flip]')) { const layer = selected(); if (layer) { layer.flip = !layer.flip; syncLayerSelect(); updateLayer(layer); } return; }
