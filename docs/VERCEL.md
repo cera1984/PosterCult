@@ -17,3 +17,7 @@ Usare l'importazione Git: il pacchetto statico attuale pesa circa 247,5 MiB (922
 `node scripts/build-static.mjs` genera il pacchetto, verificato anche escludendo cartelle di sviluppo. Il pacchetto è stato servito alla radice `/` e provato in Chromium/SwiftShader a 390×844: cinema pronto, consiglio con tre note, cover 3D e rotazione funzionanti, nessun errore JavaScript. Passati anche i 27 test unitari. La verifica locale non conferma l'accesso all'account, la disponibilità del nome o l'avvenuta pubblicazione su Vercel: questi controlli richiedono il collegamento del servizio.
 
 Riferimenti: [configurazione](https://vercel.com/docs/project-configuration/vercel-json), [importazione e build Git](https://vercel.com/docs/builds), [limiti](https://vercel.com/docs/limits), [piano Hobby](https://vercel.com/docs/plans/hobby).
+
+## Collegamento attivato il 27 ottobre 2026
+
+Progetto Vercel `cera1984/postercult`, piano Hobby, collegato al repository `cera1984/PosterCult`. Branch di produzione verificato: `main`. Le credenziali e i file di collegamento locali generati dalla CLI sono esclusi da Git tramite `.vercel/` e `.env*`. Il push su `main` avvia il primo deploy Git e quelli successivi; indirizzo e stato effettivi vanno confermati dopo il completamento della build.
