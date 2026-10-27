@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PHONE_CASE_MODELS } from '../phone-case-models.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const base = new URL((process.env.PAGES_BASE_URL || 'https://cera1984.github.io/PosterCult').replace(/\/?$/, '/'));
@@ -24,6 +25,7 @@ async function collect(reference, parent = base) {
   }
 }
 for (const entry of entries) await collect(entry);
+for (const model of PHONE_CASE_MODELS) await collect(model.asset);
 
 async function fetchBytes(url) {
   const fresh = new URL(url);

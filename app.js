@@ -44,7 +44,7 @@ function tshirtMarkup() {
 }
 
 function phoneCaseMarkup() {
-  return `<div class="phonecase-viewer" data-state="loading"><div class="phonecase-stage" data-phonecase-stage></div><p class="tshirt-status" data-phonecase-status role="status" aria-live="polite">Caricamento cover 3D…</p><fieldset class="tshirt-controls" data-phonecase-controls disabled><legend>Modello iPhone e grafica</legend><label class="garment-choice">Cover per <select data-iphone-model aria-label="Seleziona il modello iPhone"></select></label><button type="button" data-phone-view="fit" aria-pressed="false">Grafica intera</button><button type="button" data-phone-view="fill" aria-pressed="true">Riempi cover</button><button type="button" data-phone-view="back">Retro</button><button type="button" data-phone-view="front">Fronte</button><button type="button" data-phone-view="in" aria-label="Avvicina">+</button><button type="button" data-phone-view="out" aria-label="Allontana">−</button></fieldset><p class="tshirt-credit">Ruota il modello con un trascinamento · zoom con rotella o pizzico. <a href="docs/IPHONE-16-PRO.md" target="_blank" rel="noopener">Fonti e limiti del modello 16 Pro</a>. Anteprima indicativa: controlla compatibilità, fotocamere e area stampabile con il produttore della cover.</p></div>`;
+  return `<div class="phonecase-viewer" data-state="loading"><div class="phonecase-stage" data-phonecase-stage></div><p class="tshirt-status" data-phonecase-status role="status" aria-live="polite">Caricamento cover 3D…</p><fieldset class="tshirt-controls" data-phonecase-controls disabled><legend>Modello iPhone e grafica</legend><label class="garment-choice">Cover per <select data-iphone-model aria-label="Seleziona il modello iPhone"></select></label><button type="button" data-phone-view="fit" aria-pressed="false">Grafica intera</button><button type="button" data-phone-view="fill" aria-pressed="true">Riempi cover</button><button type="button" data-phone-view="back">Retro</button><button type="button" data-phone-view="front">Fronte</button><button type="button" data-phone-view="in" aria-label="Avvicina">+</button><button type="button" data-phone-view="out" aria-label="Allontana">−</button></fieldset><p class="tshirt-credit">Ruota il modello con un trascinamento · zoom con rotella o pizzico. <a href="docs/IPHONE-COVERS.md" target="_blank" rel="noopener">Modelli, fonti e limiti</a>. Anteprima indicativa: controlla compatibilità, fotocamere e area stampabile con il produttore della cover.</p></div>`;
 }
 
 async function startTshirtViewer(item) {
@@ -207,7 +207,7 @@ async function setupPhoneCaseDialog(item) {
   const generation = viewerGeneration;
   const host = dialogContent.querySelector('.phonecase-viewer');
   try {
-    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=cover-sliders-1');
+    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=all-shells-1');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
     phoneCaseViewer = mountPhoneCaseViewer(host, item, { editor: choices.querySelector('[data-cover-editor]') });
     dialogContent.querySelector('#case-artwork').disabled = false;

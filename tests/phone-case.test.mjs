@@ -1,22 +1,27 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import validator from 'gltf-validator';
 import * as THREE from 'three';
-import { createIphone16ProCase, SPEC } from '../iphone-16-pro-geometry.js';
-
-test('16 Pro shell uses Apple body dimensions and leaves camera and front open', async () => {
-  const bytes=readFileSync(new URL('../assets/models/iphone-16-pro-shell.glb',import.meta.url));
+import { createPhoneCase } from '../iphone-16-pro-geometry.js';
+import { PHONE_CASE_MODELS } from '../phone-case-models.js';
+const hashes=new Set();
+for(const p of PHONE_CASE_MODELS)test(p.name+': valid dedicated shell, camera holes, controls and connector',async()=>{
+  const bytes=readFileSync(new URL('../assets/models/'+p.id+'-shell.glb',import.meta.url));
+  const hash=createHash('sha256').update(bytes).digest('hex');assert.ok(!hashes.has(hash));hashes.add(hash);
+  const validation=await validator.validateBytes(new Uint8Array(bytes));assert.equal(validation.issues.numErrors,0);assert.equal(validation.issues.numWarnings,0);
   const asset=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
-  const {group, surface} = createIphone16ProCase(asset.scene);
-  group.updateMatrixWorld(true);
-  assert.deepEqual([SPEC.width,SPEC.height,SPEC.depth],[71.45,149.61,8.25]);
-  const scale=1.55/SPEC.height;
-  const ray = (x,y) => new THREE.Raycaster(new THREE.Vector3(x*scale,y*scale,1),new THREE.Vector3(0,0,-1));
-  assert.equal(ray(SPEC.camera.x,SPEC.camera.y).intersectObjects(group.children).length,0,'camera opening has no triangles');
-  assert.ok(ray(0,0).intersectObject(surface,true).length,'back exists at print center');
-  const box=new THREE.Box3().setFromObject(group);
-  assert.ok(Math.abs(box.getSize(new THREE.Vector3()).x/scale-(SPEC.width+3.6))<.01);
-  group.traverse(child=>{if(child.geometry) for(const value of child.geometry.attributes.position.array) assert.ok(Number.isFinite(value));});
-  assert.ok(SPEC.back<=2.1,'back thickness within Apple guideline, not a MagSafe certification');
+  const {group,surface}=createPhoneCase(asset.scene,p);group.updateMatrixWorld(true);
+  const scale=1.55/p.height;
+  const ray=(x,y,z,dx,dy,dz,far=Infinity)=>new THREE.Raycaster(new THREE.Vector3(x,y,z).multiplyScalar(scale),new THREE.Vector3(dx,dy,dz),0,far*scale);
+  for(const c of p.cameras)assert.equal(ray(c.x,c.y,20,0,0,-1).intersectObject(group,true).length,0,'camera cutout remains open');
+  assert.ok(ray(0,0,20,0,0,-1).intersectObject(surface,true).length,'printed back exists');
+  assert.equal(ray(0,0,-p.depth-2,0,0,1,p.depth+1.5).intersectObject(group,true).length,0,'open interior');
+  assert.equal(ray(-p.width/2-2.8,p.height/2-p.controls.action,-p.depth/2,1,0,0,4).intersectObject(group,true).length,0,'left control aperture');
+  assert.equal(ray(0,-p.height/2-2.8,-p.depth/2,0,1,0,4).intersectObject(group,true).length,0,'connector aperture');
+  const size=new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3()).divideScalar(scale);
+  assert.ok(Math.abs(size.x-(p.width+3.6))<.01);assert.ok(Math.abs(size.y-(p.height+3.6))<.01);
+  group.traverse(node=>{if(node.geometry)for(const value of node.geometry.attributes.position.array)assert.ok(Number.isFinite(value));});
 });

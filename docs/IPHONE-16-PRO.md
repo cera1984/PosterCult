@@ -1,7 +1,9 @@
+> Aggiornamento: il lavoro è stato esteso a tutti i 15 modelli del selettore. Il riferimento corrente è [IPHONE-COVERS.md](IPHONE-COVERS.md). Questa pagina conserva anche la ricerca iniziale sul 16 Pro.
+
 # Cover iPhone 16 Pro — ricerca e implementazione, 27 ottobre 2026
 
 ## Risultato e stato
-Il 16 Pro usa una cover cava originale generata in GLB (3,15 MB) con sottrazioni CSG, raccordi smussati e superfici continue, senza telefono o lenti finte: dorso con foro fotocamere reale, protezione rialzata, fronte aperto e aperture chiuse da un bordo continuo per tasti, Camera Control, USB-C e speaker. La scocca assemblata con segmenti rettangolari è stata sostituita. Grafica dinamica con UV planari anche sui raccordi esterni e scelta fra Grafica intera (immagine contenuta su fondo chiaro) e Riempi cover (ritaglio centrale), rotazione OrbitControls senza limite azimutale, zoom mouse/touch e pulsanti. Il modello iniziale è il 16 Pro. Le altre 14 varianti mantengono l'anteprima precedente indicativa. Poster e T-shirt non sono stati modificati.
+Il 16 Pro usa una cover cava originale generata in GLB (3,15 MB) con sottrazioni CSG, raccordi smussati e superfici continue, senza telefono o lenti finte: dorso con foro fotocamere reale, protezione rialzata, fronte aperto e aperture chiuse da un bordo continuo per tasti, Camera Control, USB-C e speaker. La scocca assemblata con segmenti rettangolari è stata sostituita. Grafica dinamica con UV planari anche sui raccordi esterni e scelta fra Grafica intera (immagine contenuta su fondo chiaro) e Riempi cover (ritaglio centrale), rotazione OrbitControls senza limite azimutale, zoom mouse/touch e pulsanti. Il modello iniziale è il 16 Pro. Anche le altre 14 varianti ora hanno scocche GLB dedicate: vedere IPHONE-COVERS.md. Poster e T-shirt non sono stati modificati.
 
 **Non è stato acquisito né validato un modello esterno preciso con licenza commerciale.** L'implementazione è un miglioramento verificabile del prototipo, non soddisfa ancora il requisito di una cover industriale verificata. Non dichiarare compatibilità fisica o certificazione Apple.
 

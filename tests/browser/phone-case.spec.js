@@ -6,7 +6,7 @@ test('16 Pro camera opening, dynamic print, orbit, zoom and return to poster', a
   const host=page.locator('.phonecase-viewer'),stage=host.locator('[data-phonecase-stage]');
   await expect(host).toHaveAttribute('data-state','ready');
   await expect(host).toHaveAttribute('data-device-model','iPhone 16 Pro');
-  await expect(host).toHaveAttribute('data-geometry','parametric-16-pro');
+  await expect(host).toHaveAttribute('data-geometry','shell-3d');
   await page.locator('#product-dialog').screenshot({path:'test-results/iphone-16-pro-initial.png'});
   await host.locator('[data-phone-view="fit"]').click();
   await expect(host).toHaveAttribute('data-artwork-fit','contain');
