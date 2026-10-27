@@ -202,13 +202,14 @@ async function setupPhoneCaseDialog(item) {
   const choices = document.createElement('div');
   choices.className = 'tshirt-catalog';
   choices.innerHTML = `<label for="case-artwork">Grafica dal catalogo</label><select id="case-artwork" disabled>${images.map(image => `<option value="${escapeHtml(image.id)}" ${image.id === item.id ? 'selected' : ''}>${escapeHtml(image.film)} — ${escapeHtml(image.filename)}</option>`).join('')}</select><p class="dialog-note">Scegli il modello iPhone e usa la grafica selezionata come anteprima sul retro della cover. La resa reale dipende dal produttore e dalla custodia scelta.</p>`;
+  choices.insertAdjacentHTML('beforeend', '<fieldset class="print-editor cover-editor" data-cover-editor disabled><legend>Posizione e dimensione</legend><label for="cover-scale">Dimensione <output data-cover-out="scale">100%</output></label><input id="cover-scale" data-cover-transform="scale" type="range" min="25" max="300" step="1" value="100"><label for="cover-x">Posizione orizzontale <output data-cover-out="x">0%</output></label><input id="cover-x" data-cover-transform="x" type="range" min="-100" max="100" value="0"><label for="cover-y">Posizione verticale <output data-cover-out="y">0%</output></label><input id="cover-y" data-cover-transform="y" type="range" min="-100" max="100" value="0"><button type="button" data-cover-reset>Ripristina grafica</button></fieldset>');
   dialogContent.querySelector('.variant-list').after(choices);
   const generation = viewerGeneration;
   const host = dialogContent.querySelector('.phonecase-viewer');
   try {
-    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=shell-2');
+    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=cover-sliders-1');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
-    phoneCaseViewer = mountPhoneCaseViewer(host, item);
+    phoneCaseViewer = mountPhoneCaseViewer(host, item, { editor: choices.querySelector('[data-cover-editor]') });
     dialogContent.querySelector('#case-artwork').disabled = false;
   } catch {
     if (generation === viewerGeneration && host.isConnected) {

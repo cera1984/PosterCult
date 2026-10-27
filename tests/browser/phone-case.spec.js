@@ -27,3 +27,34 @@ test('16 Pro camera opening, dynamic print, orbit, zoom and return to poster', a
   await expect(page.locator('.phonecase-viewer canvas')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
+
+
+test('cover sliders change printed pixels, preserve orbit and survive artwork/model changes', async ({page})=>{
+  await page.goto('./');await page.locator('[data-open]').first().click();
+  await page.getByRole('button',{name:'Cover iPhone 3D',exact:true}).click();
+  const host=page.locator('.phonecase-viewer'),stage=host.locator('[data-phonecase-stage]');
+  await expect(host).toHaveAttribute('data-state','ready');
+  const canvas=stage.locator('canvas'),before=await canvas.screenshot();
+  const distance=await stage.getAttribute('data-distance'),azimuth=await stage.getAttribute('data-azimuth');
+  for(const [key,value] of [['scale','145'],['x','20'],['y','-15']]){
+    await page.locator('[data-cover-transform="'+key+'"]').evaluate((el,v)=>{el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));},value);
+    await expect(host).toHaveAttribute('data-artwork-'+key,value);
+  }
+  expect((await canvas.screenshot()).equals(before)).toBe(false);
+  await expect(stage).toHaveAttribute('data-distance',distance);await expect(stage).toHaveAttribute('data-azimuth',azimuth);
+  await expect(page.locator('[data-cover-out="scale"]')).toHaveText('145%');
+  const art=await page.locator('#case-artwork option').nth(1).getAttribute('value');
+  await page.locator('#case-artwork').selectOption(art);await expect(host).toHaveAttribute('data-artwork',art);
+  await expect(host).toHaveAttribute('data-artwork-scale','145');
+  await page.locator('[data-iphone-model]').selectOption('iPhone 15');await expect(host).toHaveAttribute('data-device-model','iPhone 15');
+  await expect(host).toHaveAttribute('data-artwork-x','20');
+  await page.locator('[data-iphone-model]').selectOption('iPhone 16 Pro');
+  await page.locator('[data-cover-reset]').click();
+  for(const [key,value] of [['scale','100'],['x','0'],['y','0']]) await expect(host).toHaveAttribute('data-artwork-'+key,value);
+  await page.setViewportSize({width:390,height:844});
+  const slider=page.getByRole('slider',{name:'Dimensione',exact:false});
+  await slider.scrollIntoViewIfNeeded();await slider.focus();await page.keyboard.press('ArrowRight');
+  await expect(host).toHaveAttribute('data-artwork-scale','101');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.locator('#product-dialog').screenshot({path:'test-results/cover-sliders-mobile.png'});
+});

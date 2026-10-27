@@ -67,28 +67,15 @@ function addCameraModule(group, device, width, height, z) {
   if (pro) makeDisk(group, detailX, detailY - moduleH * .25, lensZ, moduleW * .032, moduleW * .03, new THREE.MeshStandardMaterial({ color: '#101516', metalness: .4, roughness: .2 }));
 }
 
-function fitArtwork(texture, aspect) {
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-  const sourceAspect = texture.image.width / texture.image.height;
-  if (sourceAspect > aspect) {
-    const repeatX = aspect / sourceAspect;
-    texture.repeat.set(repeatX, 1); texture.offset.set((1 - repeatX) / 2, 0);
-  } else {
-    const repeatY = sourceAspect / aspect;
-    texture.repeat.set(1, repeatY); texture.offset.set(0, (1 - repeatY) / 2);
-  }
-  texture.needsUpdate = true;
-}
-
-export function mountPhoneCaseViewer(host, initialItem) {
+export function mountPhoneCaseViewer(host, initialItem, { editor } = {}) {
   const stage = host.querySelector('[data-phonecase-stage]');
   const status = host.querySelector('[data-phonecase-status]');
   const controlsPanel = host.querySelector('[data-phonecase-controls]');
   const select = host.querySelector('[data-iphone-model]');
   select.replaceChildren(...devices.map(device => new Option(device.name, device.name)));
   select.value = 'iPhone 16 Pro';
-  let caseData, fitMode = "cover";
+  let caseData, fitMode = "cover", artworkFrame;
+  const transform = { scale: 100, x: 0, y: 0 };
   let disposed = false, renderer, controls, observer, artwork, request = 0, currentModel, environmentTarget, ground, groundTexture, facing = false;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#eeede8');
@@ -100,19 +87,48 @@ export function mountPhoneCaseViewer(host, initialItem) {
   const updateArtwork = () => {
     if (!currentModel?.print || !artwork) return;
     const aspect=currentModel.print.userData.aspect;
-    let texture;
-    if(fitMode==='contain') {
-      const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=Math.round(1024/aspect);
-      const ctx=canvas.getContext('2d');ctx.fillStyle='#f2eee6';ctx.fillRect(0,0,canvas.width,canvas.height);
-      const image=artwork.image,scale=Math.min(canvas.width/image.width,canvas.height/image.height);
-      const w=image.width*scale,h=image.height*scale;ctx.drawImage(image,(canvas.width-w)/2,(canvas.height-h)/2,w,h);
-      texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
-    } else { texture=new THREE.Texture(artwork.image);fitArtwork(texture,aspect); }
+    const material=currentModel.print.material;
+    const texture=material.map || new THREE.CanvasTexture(document.createElement('canvas'));
+    const canvas=texture.image;
+    const height=Math.round(1024/aspect);
+    if(canvas.width!==1024 || canvas.height!==height) {canvas.width=1024;canvas.height=height;}
+    const ctx=canvas.getContext('2d');ctx.fillStyle='#f2eee6';ctx.fillRect(0,0,canvas.width,canvas.height);
+    const image=artwork.image;
+    const fit=fitMode==='contain'?Math.min:Math.max;
+    const scale=fit(canvas.width/image.width,canvas.height/image.height)*transform.scale/100;
+    const w=image.width*scale,h=image.height*scale;
+    ctx.drawImage(image,(canvas.width-w)/2+canvas.width*transform.x/100,(canvas.height-h)/2-canvas.height*transform.y/100,w,h);
+    texture.colorSpace=THREE.SRGBColorSpace;
     texture.anisotropy=renderer?.capabilities.getMaxAnisotropy() || 1;
-    const previous = currentModel.print.material.map;
-    currentModel.print.material.map = texture; currentModel.print.material.needsUpdate = true;
-    previous?.dispose(); render();
+    texture.needsUpdate=true;
+    material.map=texture;material.needsUpdate=true;
+    for(const [key,value] of Object.entries(transform)) host.dataset['artwork'+key[0].toUpperCase()+key.slice(1)]=String(value);
+    render();
   };
+  const syncEditor = () => {
+    if(!editor) return;
+    for(const [key,value] of Object.entries(transform)) {
+      editor.querySelector('[data-cover-transform="'+key+'"]').value=String(value);
+      editor.querySelector('[data-cover-out="'+key+'"]').textContent=value+'%';
+    }
+  };
+  const onTransform = event => {
+    const key=event.target.dataset.coverTransform;
+    if(!Object.hasOwn(transform,key)) return;
+    const value=Number(event.target.value);
+    if(!Number.isFinite(value)) return;
+    transform[key]=THREE.MathUtils.clamp(value,key==='scale'?25:-100,key==='scale'?300:100);
+    syncEditor();
+    cancelAnimationFrame(artworkFrame);
+    artworkFrame=requestAnimationFrame(()=>{if(!disposed)updateArtwork();});
+  };
+  const onReset = event => {
+    if(!event.target.closest('[data-cover-reset]')) return;
+    Object.assign(transform,{scale:100,x:0,y:0});syncEditor();updateArtwork();
+  };
+  editor?.addEventListener('input',onTransform);
+  editor?.addEventListener('click',onReset);
+
   const setModel = device => {
     if (currentModel) {
       scene.remove(currentModel.group);
@@ -205,6 +221,8 @@ export function mountPhoneCaseViewer(host, initialItem) {
   const dispose = () => {
     if (disposed) return;
     disposed = true; ++request;
+    cancelAnimationFrame(artworkFrame);
+    editor?.removeEventListener('input',onTransform);editor?.removeEventListener('click',onReset);
     select.removeEventListener('change', onModelChange); host.removeEventListener('click', onAction);
     observer?.disconnect(); caseData?.traverse(node=>{node.geometry?.dispose();node.material?.dispose();}); controls?.dispose(); artwork?.dispose(); environmentTarget?.dispose(); groundTexture?.dispose();
     scene.traverse(object => { object.geometry?.dispose(); if (object.material) { const materials = Array.isArray(object.material) ? object.material : [object.material]; for (const material of materials) { material.map?.dispose(); material.dispose(); } } });
@@ -239,7 +257,7 @@ export function mountPhoneCaseViewer(host, initialItem) {
       select.value = initialModel.name; setModel(initialModel);
       await setArtwork(initialItem);
       if (disposed) return;
-      controlsPanel.disabled = false; host.dataset.state = 'ready';
+      controlsPanel.disabled = false; if(editor)editor.disabled=false; host.dataset.state = 'ready';
     } catch (error) {
       if (disposed) return;
       host.dataset.state = 'error'; setStatus('Vista 3D non disponibile. Usa un browser con WebGL 2 e apri il sito via HTTP/HTTPS.'); console.warn('PosterCult iPhone 3D:', error);

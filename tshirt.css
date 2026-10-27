@@ -34,3 +34,5 @@
 .print-editor button,.compositions button{background:#f8f5eb;border:1px solid #b6b9aa;color:#26382b;padding:8px 10px;min-height:38px;font-size:11px;cursor:pointer}
 .print-editor button:disabled{opacity:.5;cursor:wait}.compositions{gap:8px}.compositions::after{content:"Salvataggio locale: visibile solo in questo browser e dispositivo.";font-size:10px;color:#626b61}
 @media(max-width:760px){.print-editor select,.compositions select,.compositions input,#tshirt-artwork{font-size:16px}.print-editor button,.compositions button{min-height:44px}.print-editor input[type=range]{min-height:36px}}
+
+.cover-editor{border-right:0;border-left:0;border-bottom:0;min-width:0;padding:14px 0 0}.cover-editor legend{font-size:12px}.cover-editor:disabled{opacity:.55}
