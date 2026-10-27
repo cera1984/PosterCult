@@ -23,6 +23,7 @@ let selectedImage = null;
 let selectedType = 'poster';
 let folderSelection = [];
 let selectedFilm = 'tutti';
+let sortMode = 'archive', lastVisible = [];
 const catalog = window.PosterCatalog;
 let tshirtViewer = null;
 let phoneCaseViewer = null;
@@ -122,7 +123,7 @@ function setFeatured() {
   const selection = [choose('2001 SPACE ODDITY', 0), choose('SHINING', 1), choose('ESSI VIVONO', 2)];
   ['hero-back', 'hero-middle', 'hero-front'].forEach((id, i) => {
     const element = document.getElementById(id);
-    if (selection[i]) element.innerHTML = imageTag(selection[i], false, false);
+    if (selection[i]) {element.innerHTML = imageTag(selection[i], false, false);element.dataset.featureId=selection[i].id;element.tabIndex=0;element.setAttribute('role','button');element.setAttribute('aria-label','Apri '+selection[i].film);}
   });
   const editorial = document.getElementById('editorial-frame');
   const feature = choose('PULP FICTION', Math.min(3, images.length - 1));
@@ -142,18 +143,23 @@ function render() {
   const base = catalog.search(images, query, onlyFavorites ? favorites : null);
   updateFilters(base);
   const visible = catalog.filter(base, { category, path: folderSelection, film: selectedFilm });
-  grid.innerHTML = visible.length ? visible.map(item => `
+  if(sortMode==='title')visible.sort((a,b)=>a.film.localeCompare(b.film,'it') || a.filename.localeCompare(b.filename,'it'));
+  if(sortMode==='resolution')visible.sort((a,b)=>b.width*b.height-a.width*a.height);
+  lastVisible=visible;
+  grid.innerHTML = visible.length ? visible.map((item,index) => `
     <article class="product-card">
       <div class="product-visual">
-        <span class="product-tag">${escapeHtml(item.group)}</span>
+        <span class="card-index">N° ${String(index+1).padStart(3,'0')}</span><span class="product-tag">${escapeHtml(item.group)}</span>
         <button class="favorite-button ${favorites.has(item.id) ? 'is-favorite' : ''}" type="button" data-favorite="${item.id}" aria-label="${favorites.has(item.id) ? 'Rimuovi' : 'Aggiungi'} ${escapeHtml(item.filename)} ${favorites.has(item.id) ? 'dai' : 'ai'} preferiti" aria-pressed="${favorites.has(item.id)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20.5 8.6c0 4.7-8.5 10-8.5 10s-8.5-5.3-8.5-10a4.6 4.6 0 0 1 8.5-2.3 4.6 4.6 0 0 1 8.5 2.3Z"/></svg></button>
-        <div class="product-open" role="button" tabindex="0" data-open="${item.id}" aria-label="Apri il poster ${escapeHtml(item.filename)}">${mockup(item, 'poster')}</div>
+        <div class="product-open" role="button" tabindex="0" data-open="${item.id}" aria-label="Apri il poster ${escapeHtml(item.filename)}">${mockup(item, 'poster')}<span class="card-open-hint">Esplora la locandina ↗</span></div>
+        <div class="card-quick-actions" role="group" aria-label="Prova ${escapeHtml(item.film)}"><button type="button" data-quick-type="tshirt" data-quick-id="${item.id}" aria-label="Prova ${escapeHtml(item.film)} su T-shirt">T-shirt 3D</button><button type="button" data-quick-type="cover" data-quick-id="${item.id}" aria-label="Prova ${escapeHtml(item.film)} su cover">Cover iPhone</button></div>
       </div>
       <div class="product-details"><div><h3>${escapeHtml(item.film)}</h3><p title="${escapeHtml(item.filename)}">${escapeHtml(item.filename)}</p></div><span class="product-price">${item.width} × ${item.height}</span></div>
     </article>`).join('') : `<div class="empty-state"><span aria-hidden="true">✳</span><h3>${onlyFavorites && favorites.size === 0 ? 'Nessun preferito, per ora.' : 'Nessuna immagine trovata.'}</h3><p>${onlyFavorites && favorites.size === 0 ? 'Tocca il cuore su una foto per ritrovarla qui.' : 'Prova un’altra ricerca o rimuovi i filtri.'}</p><button type="button" id="empty-reset">Mostra tutte le immagini</button></div>`;
   resultsCount.textContent = `${visible.length} ${visible.length === 1 ? 'immagine' : 'immagini'}${onlyFavorites ? ' · preferiti' : ''}`;
   clearFilters.hidden = category === 'tutti' && folderSelection.length === 0 && selectedFilm === 'tutti' && !query && !onlyFavorites;
   updateFavoriteUI();
+  document.dispatchEvent(new CustomEvent('postercult:catalog-change'));
 }
 
 function resetFilters() {
@@ -164,6 +170,8 @@ function toggleFavorite(id) {
   if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
   try { localStorage.setItem(storageKey, JSON.stringify([...favorites])); } catch { /* Facoltativo. */ }
   render();
+  grid.querySelector('[data-favorite="'+id+'"]')?.focus({preventScroll:true});
+  document.dispatchEvent(new CustomEvent('postercult:favorite',{detail:{added:favorites.has(id)}}));
 }
 
 function renderDialog() {
@@ -248,6 +256,8 @@ searchInput.addEventListener('input', render);
 filmFilter.addEventListener('change', () => { selectedFilm = filmFilter.value; render(); });
 clearFilters.addEventListener('click', resetFilters);
 grid.addEventListener('click', event => {
+  const quick=event.target.closest('[data-quick-type]');
+  if(quick){openPreview(quick.dataset.quickId,quick.dataset.quickType);return;}
   const favorite = event.target.closest('[data-favorite]');
   if (favorite) return toggleFavorite(favorite.dataset.favorite);
   const open = event.target.closest('[data-open]');
@@ -318,3 +328,15 @@ menuToggle.addEventListener('click', () => {
 mobileNav.addEventListener('click', event => {
   if (event.target.closest('a')) { mobileNav.hidden = true; menuToggle.setAttribute('aria-expanded', 'false'); menuToggle.setAttribute('aria-label', 'Apri menu'); }
 });
+
+function openPreview(id,type='poster') {
+  openDialog(id);
+  if(!selectedImage || type==='poster')return;
+  selectedType=type;renderDialog();setupTshirtDialog(selectedImage);setupPhoneCaseDialog(selectedImage);
+}
+window.PosterCultUI={
+  get images(){return images;},get visible(){return lastVisible;},get category(){return category;},
+  open:openPreview,
+  sort(mode){sortMode=['archive','title','resolution'].includes(mode)?mode:'archive';render();},
+  filterCategory(value){category=value;folderSelection=[];selectedFilm='tutti';render();}
+};

@@ -61,3 +61,6 @@ GitHub consente file singoli fino a 100 MB; il pacchetto attuale è circa 72 MB 
 Cover parametrica con grafica dinamica, rotazione e zoom. Quote nominali Apple; aperture e vestibilità da validare. [Ricerca, licenza e limiti](docs/IPHONE-16-PRO.md). Le altre varianti restano indicative.
 
 Tutte le 15 varianti iPhone 13–17 del selettore ora usano cover cave dedicate con gli stessi cursori della grafica. [Modelli, quote, limiti e test](docs/IPHONE-COVERS.md).
+
+## Interfaccia Cinema Club
+Home sfogliabile, categorie rapide, scelta casuale fra i risultati, ordinamento, griglia ampia/compatta e accesso diretto ai configuratori. [Interazioni e verifiche](docs/INTERFACE.md).

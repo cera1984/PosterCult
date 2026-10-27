@@ -10,12 +10,15 @@
     <link rel="stylesheet" href="local.css?v=editor-hoodie-2" />
     <link rel="stylesheet" href="catalog.css?v=editor-hoodie-2" />
     <link rel="stylesheet" href="tshirt.css?v=buttons-audit-1" />
+    <link rel="stylesheet" href="experience.css?v=cinema-club-1" />
     <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js"}}</script>
     <script src="gallery-data.js?v=editor-hoodie-2" defer></script>
     <script src="catalog-filters.js?v=editor-hoodie-2" defer></script>
-    <script src="app.js?v=buttons-audit-1" defer></script>
+    <script src="app.js?v=cinema-club-1" defer></script>
+    <script src="experience.js?v=cinema-club-1" defer></script>
   </head>
   <body>
+    <a class="skip-link" href="#collezione">Vai al catalogo</a>
     <div class="announcement">POSTERCULT <span aria-hidden="true">✦</span> IL TUO ARCHIVIO DI CINEMA</div>
     <header class="site-header">
       <a class="brand" href="#inizio" aria-label="PosterCult, torna all'inizio"><span class="brand-symbol" aria-hidden="true">✳</span><span>Poster<span class="brand-break">Cult</span><span class="brand-dot">.</span></span></a>
@@ -38,10 +41,10 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-grain" aria-hidden="true"></div>
         <div class="hero-copy">
-          <div class="eyebrow hero-eyebrow"><span class="little-star">✳</span> TUTTI I TUOI POSTER, IN UN POSTO SOLO <span class="line"></span> 2026</div>
-          <h1 id="hero-title">I tuoi film,<br /><em>fuori</em> dallo<br />schermo<span class="hero-period">.</span></h1>
-          <p>Le immagini del tuo archivio, finalmente facili da sfogliare. Scegli il tuo poster, guarda l’anteprima e apri l’immagine originale.</p>
-          <a href="#collezione" class="button button-light">Esplora i tuoi poster <span aria-hidden="true">↗</span></a>
+          <div class="eyebrow hero-eyebrow"><span class="little-star">✳</span> CINEMA DA COLLEZIONARE <span class="line"></span> 2026</div>
+          <h1 id="hero-title">Il cinema,<br /><em>fuori</em> dallo<br />schermo<span class="hero-period">.</span></h1>
+          <p>Locandine che meritano un posto fuori dalla sala. Sfoglia l’archivio, ritrova un cult e trasformalo in un poster, una T-shirt o una cover.</p>
+          <div class="hero-ctas"><a href="#collezione" class="button button-light">Esplora l’archivio <span aria-hidden="true">↗</span></a><button type="button" class="button button-ghost" data-surprise>Sorprendimi <span aria-hidden="true">⤨</span></button></div><div class="hero-stats"><div><strong data-archive-count>—</strong><span>immagini da riscoprire</span></div><div><strong data-film-count>—</strong><span>film, infinite storie</span></div><span class="archive-stamp" aria-hidden="true">ARCHIVIO<br>DI CULTO<br>✳</span></div>
           <div class="hero-footnote"><span class="hero-footnote-dot"></span> ARCHIVIO POSTERCULT <span>·</span> ANTEPRIME INTERATTIVE</div>
         </div>
         <div class="hero-visual" aria-label="Tre immagini dal tuo archivio">
@@ -49,7 +52,7 @@
           <div class="hero-card hero-card-back" id="hero-back"></div>
           <div class="hero-card hero-card-middle" id="hero-middle"></div>
           <div class="hero-card hero-card-front" id="hero-front"></div>
-          <span class="hero-side-note">UNA PARTE DEL TUO ARCHIVIO — 01 / 03</span>
+          <div class="feature-caption"><div><span class="feature-kicker">IN PROIEZIONE <span id="feature-count">01 / 03</span></span><button type="button" id="feature-open" aria-label="Apri la locandina in evidenza"><span id="feature-title">Dall’archivio</span> ↗</button></div><div class="feature-arrows"><button type="button" data-feature-step="-1" aria-label="Locandina precedente">←</button><button type="button" data-feature-step="1" aria-label="Locandina successiva">→</button></div></div>
         </div>
         <div class="hero-vertical" aria-hidden="true">SCOPRI LE TUE IMMAGINI <span>↓</span></div>
       </section>
@@ -62,23 +65,25 @@
       </section>
 
       <section class="collection section-shell" id="collezione" aria-labelledby="collection-title">
-        <div class="collection-heading"><div><div class="section-index">02 / LE TUE IMMAGINI</div><h2 id="collection-title">Scegli il tuo <em>prossimo poster.</em></h2></div><p>Tutte le immagini da E:\POSTERZ. Cerca per titolo, cartella o nome del file.</p></div>
+        <div class="collection-heading"><div><div class="section-index">02 / LE TUE IMMAGINI</div><h2 id="collection-title">Scegli il tuo <em>prossimo poster.</em></h2></div><p>Un’immagine, tante possibilità. Scegli una locandina e provala nel tuo piccolo studio di stampa.</p></div>
+        <div class="archive-bar"><div class="category-shortcuts" id="category-shortcuts" aria-label="Categorie rapide"></div><button type="button" class="lucky-button" data-surprise>Una scelta a caso <span aria-hidden="true">↗</span></button></div>
         <div class="collection-toolbar">
           <div class="category-tabs" id="category-tabs" role="group" aria-label="Filtra per cartella"></div>
           <div class="toolbar-right"><label class="search-field" for="catalog-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="catalog-search" type="search" placeholder="Film o nome del file..." autocomplete="off" /></label><select id="film-filter" aria-label="Filtra per film"><option value="tutti">Tutti i film</option></select></div>
         </div>
-        <div class="results-meta"><span id="results-count" role="status" aria-live="polite">Caricamento immagini…</span><button id="clear-filters" type="button" hidden>Rimuovi filtri ×</button></div>
+        <div class="results-meta"><div class="results-summary"><span id="results-count" role="status" aria-live="polite">Caricamento immagini…</span><button id="clear-filters" type="button" hidden>Rimuovi filtri ×</button></div><div class="archive-view-tools"><label class="sort-label" for="archive-sort">Ordina <select id="archive-sort"><option value="archive">Come in archivio</option><option value="title">Titolo A–Z</option><option value="resolution">Risoluzione maggiore</option></select></label><div class="density-switch" role="group" aria-label="Densità del catalogo"><button type="button" data-density="gallery" aria-label="Griglia ampia" aria-pressed="true">▦</button><button type="button" data-density="compact" aria-label="Griglia compatta" aria-pressed="false">▦▦</button></div></div></div>
         <div class="product-grid" id="product-grid"></div>
         <div class="collection-end"><span>✳</span><p>Le foto originali rimangono <em>nelle tue cartelle.</em></p></div>
       </section>
 
-      <section class="editorial" id="come-funziona"><div class="editorial-copy"><span class="section-index">03 / COME USARLO</span><h2>Dalle tue cartelle<br />al <em>tuo poster.</em></h2><p>Un catalogo tutto tuo: scegli un poster, visualizzalo in anteprima e apri il file originale per preparare la stampa.</p><div class="editorial-steps"><div><span>01</span><strong>Cerca</strong><p>Filtra per cartella, film o nome del file.</p></div><div><span>02</span><strong>Guarda</strong><p>Visualizza il poster e l’immagine originale.</p></div><div><span>03</span><strong>Apri</strong><p>Ritrova l’originale alla risoluzione disponibile.</p></div></div></div><div class="editorial-art"><div class="editorial-frame" id="editorial-frame"></div><span class="editorial-art-caption">DAL TUO ARCHIVIO PERSONALE · E:\POSTERZ</span></div></section>
+      <section class="editorial" id="come-funziona"><div class="editorial-copy"><span class="section-index">03 / COME USARLO</span><h2>Dalle tue cartelle<br />al <em>tuo poster.</em></h2><p>Un catalogo tutto tuo: scegli un poster, visualizzalo in anteprima e apri il file originale per preparare la stampa.</p><div class="editorial-steps"><div><span>01</span><strong>Cerca</strong><p>Filtra per cartella, film o nome del file.</p></div><div><span>02</span><strong>Guarda</strong><p>Visualizza il poster e l’immagine originale.</p></div><div><span>03</span><strong>Apri</strong><p>Ritrova l’originale alla risoluzione disponibile.</p></div></div></div><div class="editorial-art"><div class="editorial-frame" id="editorial-frame"></div><span class="editorial-art-caption">OGNI LOCANDINA, UNA STORIA DA TENERE</span></div></section>
 
       <section class="closing section-shell"><span class="section-index">04 / IL TUO SPAZIO</span><h2>Ci vediamo <em>alla prossima scena.</em></h2><p>PosterCult raccoglie le immagini del catalogo e ti permette di esplorarle e provarle in anteprima.</p><a class="button button-dark" href="#collezione">Torna ai poster <span aria-hidden="true">↗</span></a></section>
     </main>
 
     <footer class="footer"><div class="footer-top"><a class="brand footer-brand" href="#inizio"><span class="brand-symbol" aria-hidden="true">✳</span><span>Poster<span class="brand-break">Cult</span><span class="brand-dot">.</span></span></a><p>Un archivio di poster da esplorare.<br />Anteprime interattive per ogni immagine.</p><a href="#inizio" class="back-to-top">TORNA SU ↑</a></div><div class="footer-bottom"><span>© 2026 POSTERCULT</span><span>ANTEPRIME · CATALOGO · T-SHIRT 3D</span></div></footer>
 
+    <div id="archive-toast" class="archive-toast" role="status" aria-live="polite" hidden></div>
     <dialog id="product-dialog" class="product-dialog" aria-labelledby="dialog-title"><button type="button" class="dialog-close" id="dialog-close" aria-label="Chiudi anteprima">×</button><div id="dialog-content"></div></dialog>
   </body>
 </html>
