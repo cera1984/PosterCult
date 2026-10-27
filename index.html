@@ -11,13 +11,13 @@
     <link rel="stylesheet" href="catalog.css?v=editor-hoodie-2" />
     <link rel="stylesheet" href="tshirt.css?v=rotation-1" />
     <link rel="stylesheet" href="experience.css?v=cinema-club-1" />
-    <link rel="stylesheet" href="cinema.css?v=rotation-recommendations-1" />
+    <link rel="stylesheet" href="cinema.css?v=cinema-props-1" />
     <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js"}}</script>
     <script src="gallery-data.js?v=editor-hoodie-2" defer></script>
     <script src="catalog-filters.js?v=editor-hoodie-2" defer></script>
     <script src="app.js?v=rotation-recommendations-1" defer></script>
     <script src="experience.js?v=immersive-1" defer></script>
-    <script src="cinema.js?v=rotation-recommendations-1" defer></script>
+    <script src="cinema.js?v=cinema-props-1" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#collezione">Vai al catalogo</a>
@@ -88,12 +88,12 @@
     <dialog id="cinema-dialog" class="cinema-shell" aria-label="Cinema PosterCult" tabindex="-1">
       <div class="cinema-world" data-cinema-world></div>
       <div class="cinema-vignette" aria-hidden="true"></div>
-      <header class="cinema-topbar"><div class="cinema-wordmark">PosterCult<span>.</span><small>UN CINEMA TUTTO TUO</small></div><div class="cinema-top-actions"><button type="button" data-cinema-audio aria-pressed="false">Audio spento</button><button type="button" data-cinema-close>Catalogo ↗</button></div></header>
+      <header class="cinema-topbar"><div class="cinema-wordmark">PosterCult<span>.</span><small><a href="docs/cinema-models.html" target="_blank" rel="noopener">UN CINEMA TUTTO TUO · CREDITI ↗</a></small></div><div class="cinema-top-actions"><button type="button" data-cinema-audio aria-pressed="false">Audio spento</button><button type="button" data-cinema-close>Catalogo ↗</button></div></header>
       <div class="cinema-location"><span data-cinema-location>ATRIO / PIANO TERRA</span><h2 data-cinema-title>Benvenuto al cinema.</h2><p data-cinema-description>Trascina per guardarti intorno. Usa il comando in basso per camminare, poi tocca una porta.</p></div>
       <div class="cinema-status" data-cinema-status role="status" aria-live="polite">Prepariamo le luci dell’atrio…</div>
       <button type="button" class="cinema-rooms-button" data-cinema-rooms>Le sale <span aria-hidden="true">☷</span></button>
       <div class="cinema-walk" data-cinema-walk><button type="button" class="cinema-joystick" data-cinema-stick aria-label="Trascina per camminare. Frecce o WASD da tastiera."><span aria-hidden="true">✥</span></button><small>MUOVITI</small></div>
-      <div class="cinema-hall-ticket" data-cinema-hall-ticket><span>BIGLIETTO APERTO</span><strong data-cinema-room-count>— sale da esplorare</strong><small>Ogni porta, un altro mondo.</small><button type="button" data-cinema-random>Consigliami un film ✦</button><button type="button" data-cinema-wing hidden>Altre sale →</button></div>
+      <div class="cinema-hall-ticket" data-cinema-hall-ticket><span>BIGLIETTO APERTO</span><strong data-cinema-room-count>— sale da esplorare</strong><small>Ogni porta, un altro mondo.</small><button type="button" data-cinema-random>Consigliami un film ✦</button><button type="button" data-cinema-projector>Il proiettore ↗</button><button type="button" data-cinema-wing hidden>Altre sale →</button></div>
       <section class="cinema-projection" data-cinema-projection aria-label="Locandina in proiezione" hidden><div class="projection-controls"><button type="button" data-cinema-prev aria-label="Locandina precedente nella sala">←</button><div><span data-cinema-counter>01 / 01</span><h3 data-cinema-film>In proiezione</h3><p data-cinema-file></p></div><button type="button" data-cinema-next aria-label="Locandina successiva nella sala">→</button></div><label class="cinema-focus">Avvicinati allo schermo <input type="range" data-cinema-focus min="0" max="100" value="0" aria-label="Avvicinati allo schermo"></label><div class="projection-actions"><button type="button" data-cinema-random>Film a sorpresa ✦</button><button type="button" data-cinema-inspect>Guarda da vicino</button><button type="button" data-cinema-create="tshirt">Crea una T-shirt</button><button type="button" data-cinema-create="cover">Crea una cover ↗</button></div></section>
       <button type="button" class="cinema-back" data-cinema-back hidden>← Torna all’atrio</button>
       <aside class="cinema-recommendation" data-cinema-recommendation aria-labelledby="cinema-recommendation-title" hidden><button type="button" data-recommendation-close aria-label="Chiudi consiglio">×</button><span class="recommendation-kicker">IL CONSIGLIO DEL PROIEZIONISTA / SENZA SPOILER</span><h2 id="cinema-recommendation-title" tabindex="-1"></h2><p data-recommendation-meta></p><ol data-recommendation-tips></ol><small data-recommendation-coverage></small><div class="recommendation-actions"><button type="button" data-recommendation-close>Torna al cinema</button><button type="button" data-cinema-random>Un altro film ↗</button></div></aside><aside class="cinema-room-menu" data-cinema-room-menu aria-label="Elenco delle sale" hidden><div><span>IL PROGRAMMA DI OGGI</span><button type="button" data-cinema-menu-close aria-label="Chiudi elenco sale">×</button></div><h2>Scegli la tua sala.</h2><div data-cinema-room-list></div></aside>

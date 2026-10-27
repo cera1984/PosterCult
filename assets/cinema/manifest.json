@@ -1,0 +1,139 @@
+{
+  "pack": "https://3dassets.dev/packs/abandoned-cinema-and-projection-booth",
+  "retrieved": "2026-10-27",
+  "assets": [
+    {
+      "key": "auditorium-seat",
+      "file": "auditorium-seat.glb",
+      "title": "Auditorium Seat (Abandoned Cinema and Projection Booth)",
+      "source": "https://3dassets.dev/assets/abandoned-cinema-and-projection-booth-abandoned-cinema-77b1adbd",
+      "download": "https://cdn.3dassets.dev/assets/29696/v1/model.glb",
+      "author": "3D Assets",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "aiGenerated": true,
+      "aiModel": "GPT-6",
+      "bytes": 94460,
+      "sha256": "8a8f2ffe1600d25a38f72174a41ddb263abff5e6f671781fdbc2042d96f3080e",
+      "triangles": 3596
+    },
+    {
+      "key": "curtain-panel",
+      "file": "curtain-panel.glb",
+      "title": "Curtain Panel (Abandoned Cinema and Projection Booth)",
+      "source": "https://3dassets.dev/assets/abandoned-cinema-and-projection-booth-abandoned-cinema-a1d3c970",
+      "download": "https://cdn.3dassets.dev/assets/29703/v1/model.glb",
+      "author": "3D Assets",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "aiGenerated": true,
+      "aiModel": "GPT-6",
+      "bytes": 75832,
+      "sha256": "a1e80a1102de88fd7f94a01f8742a87ce044586e34cec9ce1a4aa27c7eb7a6b3",
+      "triangles": 1776
+    },
+    {
+      "key": "film-projector",
+      "file": "film-projector.glb",
+      "title": "Film Projector (Abandoned Cinema and Projection Booth)",
+      "source": "https://3dassets.dev/assets/abandoned-cinema-and-projection-booth-abandoned-cinema-4aa0cd4a",
+      "download": "https://cdn.3dassets.dev/assets/29705/v1/model.glb",
+      "author": "3D Assets",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "aiGenerated": true,
+      "aiModel": "GPT-6",
+      "bytes": 347848,
+      "sha256": "f25b14afb49b30f6d461d1aec36220886599f216fe2f681e13e1eb15d93ba704",
+      "triangles": 9708
+    },
+    {
+      "key": "projector-pedestal",
+      "file": "projector-pedestal.glb",
+      "title": "Projector Pedestal (Abandoned Cinema and Projection Booth)",
+      "source": "https://3dassets.dev/assets/abandoned-cinema-and-projection-booth-abandoned-cinema-d5f3dc2d",
+      "download": "https://cdn.3dassets.dev/assets/29706/v1/model.glb",
+      "author": "3D Assets",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "aiGenerated": true,
+      "aiModel": "GPT-6",
+      "bytes": 84128,
+      "sha256": "03630e45239d40fdfdf8f4d325b250013e8f18ebc032db2b34416912bfe542cc",
+      "triangles": 3360
+    },
+    {
+      "key": "film-reel",
+      "file": "film-reel.glb",
+      "title": "Film Reel (Abandoned Cinema and Projection Booth)",
+      "source": "https://3dassets.dev/assets/abandoned-cinema-and-projection-booth-abandoned-cinema-02ebd4de",
+      "download": "https://cdn.3dassets.dev/assets/29707/v1/model.glb",
+      "author": "3D Assets",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "aiGenerated": true,
+      "aiModel": "GPT-6",
+      "bytes": 111400,
+      "sha256": "1a146ac5d9d15ea0ea0c058023f8e36a20846e5a041a423281eb7194f31f1bd7",
+      "triangles": 2688
+    },
+    {
+      "key": "concession-counter",
+      "file": "concession-counter.glb",
+      "title": "Concession Counter (Abandoned Cinema and Projection Booth)",
+      "source": "https://3dassets.dev/assets/abandoned-cinema-and-projection-booth-abandoned-cinema-2fbcad52",
+      "download": "https://cdn.3dassets.dev/assets/29721/v1/model.glb",
+      "author": "3D Assets",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "aiGenerated": true,
+      "aiModel": "GPT-6",
+      "bytes": 99348,
+      "sha256": "e403f39e93fdcac9ab1e236c007e0e812d1362b9cc4c3eaaef23421e0f13090a",
+      "triangles": 4248
+    },
+    {
+      "key": "popcorn-machine",
+      "file": "popcorn-machine.glb",
+      "title": "Popcorn Machine (Abandoned Cinema and Projection Booth)",
+      "source": "https://3dassets.dev/assets/abandoned-cinema-and-projection-booth-abandoned-cinema-d8ae891e",
+      "download": "https://cdn.3dassets.dev/assets/29722/v1/model.glb",
+      "author": "3D Assets",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "aiGenerated": true,
+      "aiModel": "GPT-6",
+      "bytes": 86764,
+      "sha256": "f6730c5d948e4f73697c1724d4d337499c872f79a239d6eccb7ce0a6d91244c9",
+      "triangles": 2552
+    }
+  ]
+}

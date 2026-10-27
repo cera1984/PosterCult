@@ -1,0 +1,10 @@
+# Modelli 3D del cinema
+
+Sette file GLB del pacchetto **Abandoned Cinema and Projection Booth**, pubblicato da **3D Assets**, scaricati il 27 ottobre 2026 e conservati localmente in `assets/cinema/`. Licenza dichiarata **CC0 1.0 Universal**. La fonte dichiara la generazione con strumenti AI (GPT-6); non sono scansioni di oggetti storici e non certificano fedeltà meccanica.
+
+Fonte: https://3dassets.dev/packs/abandoned-cinema-and-projection-booth
+Licenza: https://creativecommons.org/publicdomain/zero/1.0/
+
+I file originali non sono modificati; il sito adatta materiali, colori e disposizione durante il caricamento. Provenienza individuale, dimensioni e SHA-256 sono registrati in manifest.json. Attribuzione non obbligatoria per CC0, mantenuta per trasparenza.
+
+Modelli: Film Projector, Projector Pedestal, Auditorium Seat, Curtain Panel, Film Reel, Popcorn Machine, Concession Counter.

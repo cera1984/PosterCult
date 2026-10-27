@@ -16,7 +16,7 @@
   $('[data-cinema-room-count]').textContent=rooms.length+' sale da esplorare';
   $('[data-cinema-wing]').hidden=rooms.length<=9;
   rooms.forEach((r,i)=>{const b=document.createElement('button');b.type='button';b.dataset.cinemaRoom=r.key;const n=document.createElement('span');n.textContent='SALA '+String(i+1).padStart(2,'0');const name=document.createElement('strong');name.textContent=r.label;const count=document.createElement('small');count.textContent=r.items.length+' locandine  ↗';b.append(n,name,count);$('[data-cinema-room-list]').append(b);});
-  function hall(){hideRecommendation();selection++;room=null;menu(false);setMode('hall');world?.showHall(wing);$('[data-cinema-location]').textContent='ATRIO / ALA '+String(wing+1).padStart(2,'0');$('[data-cinema-title]').textContent='Ogni porta, un altro mondo.';$('[data-cinema-description]').textContent='Trascina per guardarti intorno. Usa il comando circolare per camminare e tocca una porta.';status('Scegli una porta o apri Le sale.');}
+  function hall(){delete dialog.dataset.focus;$('[data-cinema-projector]').textContent='Il proiettore ↗';hideRecommendation();selection++;room=null;menu(false);setMode('hall');world?.showHall(wing);$('[data-cinema-location]').textContent='ATRIO / ALA '+String(wing+1).padStart(2,'0');$('[data-cinema-title]').textContent='Ogni porta, un altro mondo.';$('[data-cinema-description]').textContent='Trascina per guardarti intorno. Usa il comando circolare per camminare e tocca una porta.';status('Scegli una porta o apri Le sale.');}
   async function project(next){
     hideRecommendation();if(!room||!world)return;const token=++selection,current=room,candidate=(next+room.items.length)%room.items.length,item=room.items[candidate];
     status('Il proiezionista sta cambiando la locandina…');
@@ -27,14 +27,14 @@
     $('[data-cinema-prev]').disabled=$('[data-cinema-next]').disabled=room.items.length<2;status(item.film+' · in proiezione');
   }
   async function enterRoom(key, initialIndex=0){
-    const next=rooms.find(r=>r.key===key);if(!next)return;
+    const next=rooms.find(r=>r.key===key);if(!next)return;delete dialog.dataset.focus;
     if(fallback){ui.filterCategory(key);dialog.close();document.getElementById('collezione').scrollIntoView({behavior:'smooth'});return;}
     room=next;index=0;pendingIndex=0;delete dialog.dataset.posterId;$('[data-cinema-prev]').disabled=$('[data-cinema-next]').disabled=next.items.length<2;dialog.querySelectorAll('[data-cinema-create],[data-cinema-inspect]').forEach(button=>button.disabled=true);$('[data-cinema-film]').textContent=next.label;$('[data-cinema-file]').textContent='';menu(false);setMode('room');$('[data-cinema-location]').textContent='IN SALA / '+next.label.toUpperCase();$('[data-cinema-title]').textContent='Mettiti comodo.';$('[data-cinema-description]').textContent='Sfoglia le locandine sullo schermo. Quella giusta ti aspetta al banco di stampa.';
     $('[data-cinema-focus]').value='20';world.showRoom(next);world.setSeatZoom(20);await project(initialIndex);
   }
   async function enter(button){
     if(dialog.open)return;entry=button;document.getElementById('mobile-nav').hidden=true;document.getElementById('menu-toggle').setAttribute('aria-expanded','false');document.getElementById('menu-toggle').setAttribute('aria-label','Apri menu');const token=++opening;fallback=false;dialog.dataset.state='loading';dialog.showModal();document.body.classList.add('cinema-open');$('[data-cinema-fallback]').hidden=true;menu(false);setMode('hall');status('Accendiamo le luci…');
-    try{const {createCinemaWorld}=await import('./cinema-world.js?v=immersive-1');if(token!==opening||!dialog.open)return;
+    try{const {createCinemaWorld}=await import('./cinema-world.js?v=cinema-props-1');if(token!==opening||!dialog.open)return;
       world=createCinemaWorld($('[data-cinema-world]'),rooms,{onDoor:enterRoom,onInspect:()=>openProduct('poster')});dialog.dataset.state='ready';hall();
     }catch(error){if(token!==opening||!dialog.open)return;fallback=true;dialog.dataset.state='error';$('[data-cinema-fallback]').hidden=false;$('[data-cinema-walk]').hidden=true;status('Il catalogo e le sale rimangono disponibili.');console.warn('PosterCult cinema:',error);}
   }
@@ -94,6 +94,7 @@
     if(event.target.closest('[data-cinema-menu-close]'))menu(false);
     const r=event.target.closest('[data-cinema-room]');if(r)enterRoom(r.dataset.cinemaRoom);
     if(event.target.closest('[data-cinema-back]'))hall();
+    if(event.target.closest('[data-cinema-projector]')){if(dialog.dataset.focus==='projector')hall();else{dialog.dataset.focus='projector';world?.inspectProjector();$('[data-cinema-projector]').textContent='Esplora l’atrio ↗';$('[data-cinema-location]').textContent='ATRIO / LA CABINA';status('Proiettore a pellicola · trascina per guardarti intorno.');}}
     if(event.target.closest('[data-cinema-wing]')){wing=(wing+1)%Math.ceil(rooms.length/9);hall();}
     if(event.target.closest('[data-cinema-prev]'))project(pendingIndex-1);
     if(event.target.closest('[data-cinema-next]'))project(pendingIndex+1);

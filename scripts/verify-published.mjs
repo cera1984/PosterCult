@@ -26,6 +26,8 @@ async function collect(reference, parent = base) {
 }
 for (const entry of entries) await collect(entry);
 for (const model of PHONE_CASE_MODELS) await collect(model.asset);
+const cinemaManifest = JSON.parse(await readFile(resolve(root, 'assets/cinema/manifest.json'), 'utf8'));
+for (const asset of cinemaManifest.assets) await collect('./assets/cinema/' + asset.file);
 
 async function fetchBytes(url) {
   const fresh = new URL(url);
