@@ -1,0 +1,24 @@
+import { test, expect } from '@playwright/test';
+test('16 Pro camera opening, dynamic print, orbit, zoom and return to poster', async ({page})=>{
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('./');await page.locator('[data-open]').first().click();
+  await page.getByRole('button',{name:'Cover iPhone 3D',exact:true}).click();
+  const host=page.locator('.phonecase-viewer'),stage=host.locator('[data-phonecase-stage]');
+  await expect(host).toHaveAttribute('data-state','ready');
+  await expect(host).toHaveAttribute('data-device-model','iPhone 16 Pro');
+  await expect(host).toHaveAttribute('data-geometry','parametric-16-pro');
+  const before=await stage.getAttribute('data-distance');
+  await host.locator('[data-phone-view="in"]').click();
+  expect(Number(await stage.getAttribute('data-distance'))).toBeLessThan(Number(before));
+  const box=await stage.boundingBox();const az=await stage.getAttribute('data-azimuth');
+  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.mouse.move(box.x+box.width/2+100,box.y+box.height/2,{steps:10});await page.mouse.up();
+  expect(await stage.getAttribute('data-azimuth')).not.toBe(az);
+  const art=await page.locator('#case-artwork option').nth(1).getAttribute('value');
+  await page.locator('#case-artwork').selectOption(art);await expect(host).toHaveAttribute('data-artwork',art);
+  await page.locator('#product-dialog').screenshot({path:'test-results/iphone-16-pro.png'});
+  await host.locator('[data-phone-view="front"]').click();
+  await page.locator('#product-dialog').screenshot({path:'test-results/iphone-16-pro-inside.png'});
+  await page.getByRole('button',{name:'Poster',exact:true}).click();
+  await expect(page.locator('.phonecase-viewer canvas')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});

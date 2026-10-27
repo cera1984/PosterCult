@@ -55,3 +55,7 @@ Il pacchetto `site` è già autosufficiente: include `assets\originals`, le mini
 4. Dopo qualche minuto l'indirizzo sarà `https://TUO-USERNAME.github.io/posterz-privato/`.
 
 GitHub consente file singoli fino a 100 MB; il pacchetto attuale è circa 72 MB complessivi. Per aggiornare le immagini: aggiungile nell'archivio, esegui `py "E:\POSTERZ\site\generate_catalog.py"`, poi ricarica su GitHub `gallery-data.js`, `thumbs` e `assets`.
+
+## Cover iPhone 16 Pro
+
+Cover parametrica con grafica dinamica, rotazione e zoom. Quote nominali Apple; aperture e vestibilità da validare. [Ricerca, licenza e limiti](docs/IPHONE-16-PRO.md). Le altre varianti restano indicative.
