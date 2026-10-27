@@ -207,7 +207,7 @@ async function setupPhoneCaseDialog(item) {
   const generation = viewerGeneration;
   const host = dialogContent.querySelector('.phonecase-viewer');
   try {
-    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=all-shells-1');
+    const { mountPhoneCaseViewer } = await import('./phone-case-viewer.js?v=buttons-audit-1');
     if (generation !== viewerGeneration || !host.isConnected || !dialog.open) return;
     phoneCaseViewer = mountPhoneCaseViewer(host, item, { editor: choices.querySelector('[data-cover-editor]') });
     dialogContent.querySelector('#case-artwork').disabled = false;

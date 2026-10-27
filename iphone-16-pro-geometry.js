@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Original preview geometry; dimensions in mm. See docs/IPHONE-16-PRO.md.
 import * as THREE from 'three';
-import { IPHONE_16_PRO } from './phone-case-models.js';
+import { IPHONE_16_PRO } from './phone-case-models.js?v=buttons-audit-1';
 export const SPEC = {...IPHONE_16_PRO,camera:IPHONE_16_PRO.cameras[0]};
 
 export function roundedRect(w, h, r, x = 0, y = 0) {

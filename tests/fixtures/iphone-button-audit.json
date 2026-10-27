@@ -1,0 +1,363 @@
+{
+  "units": "mm",
+  "datum": "top of phone to button centre (mute: pocket centre)",
+  "drawingSheet": 1,
+  "pdfPage": 2,
+  "sideConvention": "viewed from the display; mesh +X is front-left",
+  "models": {
+    "iphone-13": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-13.pdf",
+      "pdfSHA256": "7a844ac71d75243a066ada314bb91f752440d3ff0e883cbf743338b428527911",
+      "buttons": {
+        "action": {
+          "fromTop": 32.22,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 45.53,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 59.53,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 52.53,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-13-pro": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-13-pro.pdf",
+      "pdfSHA256": "b46fdb2776683e8ca98e6cf630d100ba10a2b6f1850faeb24969b73ca1dffd19",
+      "buttons": {
+        "action": {
+          "fromTop": 32.22,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 45.53,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 59.53,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 52.53,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-13-pro-max": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-13-pro-max.pdf",
+      "pdfSHA256": "6d666ea36256d437d63787b00688cca7395a38be760785d8071bb929ea12d85d",
+      "buttons": {
+        "action": {
+          "fromTop": 32.22,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 45.53,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 59.53,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 52.53,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-14": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-14.pdf",
+      "pdfSHA256": "bfb67d96ef998bd58daf488762f69bf09655c1e46556f438bbd1ce14521bacd5",
+      "buttons": {
+        "action": {
+          "fromTop": 31.98,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 45.43,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 59.63,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 52.53,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-14-pro": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-14-pro.pdf",
+      "pdfSHA256": "6eb71ec212d32c73bd50fd6f0ccec5da3132aebf4896106a6a9804aa9e2814e2",
+      "buttons": {
+        "action": {
+          "fromTop": 31.14,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 44.59,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 58.79,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 55.54,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-14-pro-max": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-14-pro-max.pdf",
+      "pdfSHA256": "c5dd7ffa374d2fbb64d4a5fc56884fcb548bde3b5226a41481c1567a36695c1e",
+      "buttons": {
+        "action": {
+          "fromTop": 31.14,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 44.59,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 58.79,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 55.54,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-15": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-15.pdf",
+      "pdfSHA256": "3df274ae048d414639534e1cf2ea881d510b3d445a8504f81461a1d8cca318fd",
+      "buttons": {
+        "action": {
+          "fromTop": 32.83,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 46.27,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 60.47,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 53.37,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-15-pro": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-15-pro.pdf",
+      "pdfSHA256": "c6d075926642fea8d6fe77b5217ddb92fc3899d357e10c30026fdf474bd2b4e3",
+      "buttons": {
+        "action": {
+          "fromTop": 31.67,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 45.22,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 59.42,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 56.17,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-15-pro-max": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-15-pro-max.pdf",
+      "pdfSHA256": "d5c11d8565b2e4b2ddfc05e0b9ee74547e151b9e614f95aa9970fab758eaacc1",
+      "buttons": {
+        "action": {
+          "fromTop": 31.67,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 45.22,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 59.42,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 56.17,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-16": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-16.pdf",
+      "pdfSHA256": "61e491a19889a8ab002533480ba8b3669fcc6041760854f1bd1671e60099236f",
+      "buttons": {
+        "action": {
+          "fromTop": 34.08,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 48.23,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 62.43,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 55.33,
+          "sideFromFront": "right"
+        },
+        "cameraControl": {
+          "fromTop": 96.23,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-16-pro": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-16-pro.pdf",
+      "pdfSHA256": "c6def4f23a9916c71e413f49abca686a2719657ec6cf99253eb8be09f3a6bef8",
+      "buttons": {
+        "action": {
+          "fromTop": 34.08,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 48.23,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 62.43,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 55.33,
+          "sideFromFront": "right"
+        },
+        "cameraControl": {
+          "fromTop": 98.19,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-16-pro-max": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-16-pro-max.pdf",
+      "pdfSHA256": "e22f2999d095e4e4f464c25b0d33fcf776d1a746c1c2509d2850706507dd8231",
+      "buttons": {
+        "action": {
+          "fromTop": 34.08,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 48.23,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 62.43,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 55.33,
+          "sideFromFront": "right"
+        },
+        "cameraControl": {
+          "fromTop": 111.62,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-17": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-17.pdf",
+      "pdfSHA256": "f9f26055025828fd153515cf2dffd2bf6454b6f7f16f401919c7bddcd906bfa6",
+      "buttons": {
+        "action": {
+          "fromTop": 34.08,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 48.23,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 62.43,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 55.32,
+          "sideFromFront": "right"
+        },
+        "cameraControl": {
+          "fromTop": 98.2,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-17-pro": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-17-pro.pdf",
+      "pdfSHA256": "4bfe2cc77b06a34d4802455b9a2fd0d752d96b33c1dcb80f9326dfe00b7acf9e",
+      "buttons": {
+        "action": {
+          "fromTop": 34.28,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 48.43,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 62.63,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 55.53,
+          "sideFromFront": "right"
+        },
+        "cameraControl": {
+          "fromTop": 98.4,
+          "sideFromFront": "right"
+        }
+      }
+    },
+    "iphone-17-pro-max": {
+      "source": "https://developer.apple.com/download/files/accessories/dimensional-drawings/iphone-17-pro-max.pdf",
+      "pdfSHA256": "47bcbc8d562cda09aa96cc96db04df9246634175a19974077d16729db38996f4",
+      "buttons": {
+        "action": {
+          "fromTop": 34.28,
+          "sideFromFront": "left"
+        },
+        "volumeUp": {
+          "fromTop": 48.43,
+          "sideFromFront": "left"
+        },
+        "volumeDown": {
+          "fromTop": 62.63,
+          "sideFromFront": "left"
+        },
+        "power": {
+          "fromTop": 55.53,
+          "sideFromFront": "right"
+        },
+        "cameraControl": {
+          "fromTop": 111.82,
+          "sideFromFront": "right"
+        }
+      }
+    }
+  }
+}

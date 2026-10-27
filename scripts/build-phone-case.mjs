@@ -25,10 +25,12 @@ for(const p of PHONE_CASE_MODELS) {
   const cut=b=>{body=evaluator.evaluate(body,b,SUBTRACTION);body.updateMatrixWorld(true);};
   cut(solid(roundedRect(p.width+.6,p.height+.6,p.corner),-p.depth-2,p.depth+2));
   for(const c of p.cameras)cut(solid(roundedRect(c.width,c.height,c.radius,c.x,c.y),-1,8,.25));
-  function sideCut(side,top,length,height){
+  function sideCut(sideFromFront,top,length,height){
     const b=solid(roundedRect(length,height,height/2),0,8,.18);
     b.geometry.rotateZ(Math.PI/2);b.geometry.rotateY(Math.PI/2);
-    b.position.set(side==='left'?-w/2-4:w/2-4,p.height/2-top,-p.depth/2);
+    // Mesh +Z faces the printed BACK, with its camera at -X.
+    // The phone's front-left controls therefore lie at mesh +X.
+    b.position.set(sideFromFront==='left'?w/2-4:-w/2-4,p.height/2-top,-p.depth/2);
     b.updateMatrixWorld(true);return b;
   }
   for(const [top,length,height] of [[p.controls.action,p.actionButton?9:10,p.actionButton?3.8:5], [p.controls.volumeUp,13.5,3.8],[p.controls.volumeDown,13.5,3.8]])cut(sideCut('left',top,length,height));

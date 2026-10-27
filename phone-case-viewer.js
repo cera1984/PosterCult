@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
-import { createPhoneCase } from './iphone-16-pro-geometry.js?v=all-shells-1';
-import { PHONE_CASE_MODELS as devices } from './phone-case-models.js';
+import { createPhoneCase } from './iphone-16-pro-geometry.js?v=buttons-audit-1';
+import { PHONE_CASE_MODELS as devices } from './phone-case-models.js?v=buttons-audit-1';
 import { RoomEnvironment } from './vendor/three/examples/jsm/environments/RoomEnvironment.js';
 
 export function mountPhoneCaseViewer(host, initialItem, { editor } = {}) {

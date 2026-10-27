@@ -46,3 +46,6 @@ Sono modelli originali per anteprima, non CAD industriali né mesh di un produtt
 I test unitari validano ogni GLB con Khronos, controllano ingombro, coordinate finite, fori camera e aperture per comando/porta, e verificano che i file siano distinti. I test browser percorrono il selettore completo con schermate per ogni variante, verificano i cambi rapidi, gli errori di download e la conservazione della grafica e degli slider. La verifica di pubblicazione confronta anche tutti i 15 file GLB con il commit distribuito.
 
 Esito: 25/25 test unitari e 27/27 test browser passati; tutti i 15 GLB hanno zero errori e zero warning Khronos. Controllata la tavola comparativa delle 15 schermate renderizzate.
+
+## Correzione della posizione dei tasti
+Centri di Mute/Action, Volume +, Volume -, accensione e Camera Control riletti sulle tavole Apple per ogni modello; rimossa la derivazione a distanza fissa. Corretto il passaggio fra vista frontale e posteriore. [Tabella e metodo di verifica](IPHONE-BUTTON-AUDIT.md). Le dimensioni dei fori rimangono scelte di anteprima.

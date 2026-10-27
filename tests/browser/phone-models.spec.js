@@ -13,7 +13,15 @@ test('every model loads its own shell with dynamic print and visual previews',as
     await expect(host).not.toHaveAttribute('data-model-loading',p.name);
     await expect(host).toHaveAttribute('data-geometry','shell-3d');
     await expect(host).toHaveAttribute('data-camera-layout',p.layout);
-    await host.locator('[data-phonecase-stage]').screenshot({path:'test-results/phones/'+p.id+'.png'});
+    const stage=host.locator('[data-phonecase-stage]');
+    await stage.screenshot({path:'test-results/phones/'+p.id+'.png'});
+    const box=await stage.boundingBox();
+    for(const [label,direction] of [['power',1],['volume',-1]]){
+      await host.locator('[data-phone-view="back"]').click();
+      await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();
+      await page.mouse.move(box.x+box.width/2+direction*box.height*.2,box.y+box.height/2,{steps:12});await page.mouse.up();
+      await stage.screenshot({path:'test-results/phones/'+p.id+'-'+label+'.png'});
+    }
   }
   expect(errors).toEqual([]);
 });
